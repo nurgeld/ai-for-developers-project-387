@@ -1,0 +1,6 @@
+emit:
+  - "@typespec/openapi3"
+outputDir: "./src/api"
+options:
+  "@typespec/openapi3": 
+    outputFile: "openapi.json"

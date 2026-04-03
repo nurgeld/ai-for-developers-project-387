@@ -1,0 +1,315 @@
+openapi: 3.0.0
+info:
+  title: (title)
+  version: 0.0.0
+tags:
+  - name: Event Types
+  - name: Slots
+  - name: Bookings
+  - name: Availability
+paths:
+  /availability:
+    post:
+      operationId: Availability_create
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailabilityPeriod'
+      tags:
+        - Availability
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAvailabilityRequest'
+    get:
+      operationId: Availability_list
+      parameters:
+        - name: eventTypeId
+          in: query
+          required: true
+          schema:
+            type: string
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AvailabilityPeriod'
+      tags:
+        - Availability
+  /bookings:
+    post:
+      operationId: Bookings_create
+      description: |-
+        Create a booking.
+
+        **Overlap Rule**: If the requested time slot overlaps with an existing booking,
+        returns `409 Conflict`.
+
+        The `endAt` is calculated automatically based on `EventType.durationMinutes`.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+      tags:
+        - Bookings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBookingRequest'
+    get:
+      operationId: Bookings_list
+      parameters:
+        - name: start
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          explode: false
+        - name: end
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Booking'
+      tags:
+        - Bookings
+  /event-types:
+    post:
+      operationId: EventTypes_create
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventType'
+      tags:
+        - Event Types
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEventTypeRequest'
+    get:
+      operationId: EventTypes_list
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventType'
+      tags:
+        - Event Types
+  /slots:
+    get:
+      operationId: Slots_list
+      parameters:
+        - name: eventTypeId
+          in: query
+          required: true
+          schema:
+            type: string
+          explode: false
+        - name: start
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          explode: false
+        - name: end
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Slot'
+      tags:
+        - Slots
+components:
+  schemas:
+    AvailabilityPeriod:
+      type: object
+      required:
+        - id
+        - eventTypeId
+        - dayOfWeek
+        - startTime
+        - endTime
+      properties:
+        id:
+          type: string
+        eventTypeId:
+          type: string
+        dayOfWeek:
+          type: integer
+          format: int32
+          description: Day of week (0 = Monday, 6 = Sunday)
+        startTime:
+          type: string
+          format: time
+        endTime:
+          type: string
+          format: time
+    Booking:
+      type: object
+      required:
+        - id
+        - eventTypeId
+        - startAt
+        - endAt
+        - guestName
+        - guestEmail
+        - createdAt
+      properties:
+        id:
+          type: string
+        eventTypeId:
+          type: string
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        guestName:
+          type: string
+        guestEmail:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    CreateAvailabilityRequest:
+      type: object
+      required:
+        - eventTypeId
+        - dayOfWeek
+        - startTime
+        - endTime
+      properties:
+        eventTypeId:
+          type: string
+        dayOfWeek:
+          type: integer
+          format: int32
+          description: Day of week (0 = Monday, 6 = Sunday)
+        startTime:
+          type: string
+          format: time
+        endTime:
+          type: string
+          format: time
+    CreateBookingRequest:
+      type: object
+      required:
+        - eventTypeId
+        - startAt
+        - guestName
+        - guestEmail
+      properties:
+        eventTypeId:
+          type: string
+        startAt:
+          type: string
+          format: date-time
+        guestName:
+          type: string
+        guestEmail:
+          type: string
+    CreateEventTypeRequest:
+      type: object
+      required:
+        - title
+        - description
+        - durationMinutes
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        durationMinutes:
+          type: integer
+          format: int32
+          description: Duration in minutes (e.g., 30, 60)
+    EventType:
+      type: object
+      required:
+        - id
+        - title
+        - description
+        - durationMinutes
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        durationMinutes:
+          type: integer
+          format: int32
+          description: Duration in minutes (e.g., 30, 60)
+    Slot:
+      type: object
+      required:
+        - id
+        - eventTypeId
+        - startAt
+        - endAt
+        - isBooked
+      properties:
+        id:
+          type: string
+        eventTypeId:
+          type: string
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        isBooked:
+          type: boolean
