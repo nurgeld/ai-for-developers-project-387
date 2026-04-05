@@ -25,3 +25,15 @@ dist-ssr
 
 # Mockups and design assets (large binary files)
 docs/
+
+# Python cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+coverage.xml
+.venv/
+venv/
