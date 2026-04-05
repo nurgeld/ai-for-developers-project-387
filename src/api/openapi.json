@@ -100,6 +100,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Booking'
+        '400':
+          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
       tags:
         - Owner
   /api/owner/bookings/{id}:
@@ -238,6 +244,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OwnerSettings'
+        '400':
+          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
       tags:
         - Owner
       requestBody:
@@ -286,6 +298,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Slot'
+        '400':
+          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
       tags:
         - Public
 components:

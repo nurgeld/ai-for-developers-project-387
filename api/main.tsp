@@ -257,7 +257,7 @@ interface PublicAPI {
   @route("/slots")
   @tag("Public")
   @get
-  listSlots(...ListSlotsRequest): Slot[];
+  listSlots(...ListSlotsRequest): Slot[] | ValidationError;
 
   /**
    * Создать бронирование
@@ -294,7 +294,7 @@ interface OwnerAPI {
   @route("/settings")
   @tag("Owner")
   @patch
-  updateSettings(@body body: UpdateOwnerSettingsRequest): OwnerSettings;
+  updateSettings(@body body: UpdateOwnerSettingsRequest): OwnerSettings | ValidationError;
 
   /**
    * Создать тип события
@@ -348,7 +348,7 @@ interface OwnerAPI {
   @route("/bookings")
   @tag("Owner")
   @get
-  listBookings(...ListBookingsRequest): Booking[];
+  listBookings(...ListBookingsRequest): Booking[] | ValidationError;
 
   /**
    * Отменить бронирование. Возвращает 204 No Content при успехе.

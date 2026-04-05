@@ -35,6 +35,17 @@ def test_update_owner_settings_rejects_inverted_workday(storage):
     assert exc_info.value.payload.error == "VALIDATION_ERROR"
 
 
+def test_update_owner_settings_rejects_blank_name(storage):
+    with pytest.raises(ApiException) as exc_info:
+        update_owner_settings(
+            storage,
+            UpdateOwnerSettingsRequest.model_construct(name="   "),
+        )
+
+    assert exc_info.value.status_code == 400
+    assert exc_info.value.payload.error == "VALIDATION_ERROR"
+
+
 def test_list_owner_bookings_uses_inclusive_end_date(storage):
     create_booking(
         storage,
@@ -96,3 +107,28 @@ def test_list_slots_marks_overlapping_booking_as_booked(storage):
     first_two_slots = slots[:2]
     assert len(first_two_slots) == 2
     assert all(slot.isBooked for slot in first_two_slots)
+
+
+def test_list_slots_rejects_inverted_date_range(storage):
+    with pytest.raises(ApiException) as exc_info:
+        list_slots(
+            storage,
+            event_type_id="event-type-15",
+            start_date=date(2035, 1, 11),
+            end_date=date(2035, 1, 10),
+        )
+
+    assert exc_info.value.status_code == 400
+    assert exc_info.value.payload.error == "VALIDATION_ERROR"
+
+
+def test_list_owner_bookings_rejects_inverted_date_range(storage):
+    with pytest.raises(ApiException) as exc_info:
+        list_owner_bookings(
+            storage,
+            start_date=date(2035, 1, 11),
+            end_date=date(2035, 1, 10),
+        )
+
+    assert exc_info.value.status_code == 400
+    assert exc_info.value.payload.error == "VALIDATION_ERROR"

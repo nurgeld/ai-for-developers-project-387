@@ -33,6 +33,20 @@ def test_list_slots_maps_request_validation_to_contract_error(client):
     assert response.json()["error"] == "VALIDATION_ERROR"
 
 
+def test_list_slots_rejects_inverted_date_range(client):
+    response = client.get(
+        "/api/slots",
+        params={
+            "eventTypeId": "event-type-15",
+            "startDate": "2035-01-11",
+            "endDate": "2035-01-10",
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.json()["error"] == "VALIDATION_ERROR"
+
+
 def test_owner_bookings_end_date_filter_is_inclusive(client, storage):
     storage.save_booking(
         Booking(
@@ -90,6 +104,18 @@ def test_update_owner_settings_returns_contract_validation_error(client):
     assert response.json()["error"] == "VALIDATION_ERROR"
 
 
+def test_update_owner_settings_rejects_blank_name(client):
+    response = client.patch(
+        "/api/owner/settings",
+        json={
+            "name": "   ",
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.json()["error"] == "VALIDATION_ERROR"
+
+
 def test_create_event_type_rejects_duplicate_duration(client):
     response = client.post(
         "/api/owner/event-types",
@@ -102,3 +128,31 @@ def test_create_event_type_rejects_duplicate_duration(client):
 
     assert response.status_code == 409
     assert response.json()["error"] == "DUPLICATE_DURATION"
+
+
+def test_create_booking_rejects_invalid_email(client):
+    response = client.post(
+        "/api/bookings",
+        json={
+            "eventTypeId": "event-type-15",
+            "guestName": "Alice",
+            "guestEmail": "not-an-email",
+            "startAt": "2035-01-10T09:00:00Z",
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.json()["error"] == "VALIDATION_ERROR"
+
+
+def test_owner_bookings_reject_inverted_date_range(client):
+    response = client.get(
+        "/api/owner/bookings",
+        params={
+            "startDate": "2035-01-11",
+            "endDate": "2035-01-10",
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.json()["error"] == "VALIDATION_ERROR"

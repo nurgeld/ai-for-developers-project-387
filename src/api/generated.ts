@@ -486,6 +486,15 @@ export interface operations {
                     "application/json": components["schemas"]["Booking"][];
                 };
             };
+            /** @description Ошибка валидации */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationError"];
+                };
+            };
         };
     };
     OwnerAPI_cancelBooking: {
@@ -654,6 +663,15 @@ export interface operations {
                     "application/json": components["schemas"]["OwnerSettings"];
                 };
             };
+            /** @description Ошибка валидации */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationError"];
+                };
+            };
         };
     };
     PublicAPI_getSettings: {
@@ -699,6 +717,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Slot"][];
+                };
+            };
+            /** @description Ошибка валидации */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationError"];
                 };
             };
         };

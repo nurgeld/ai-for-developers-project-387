@@ -3,6 +3,12 @@ import { Stack, TextInput, Button, Text, Loader, Center } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useOwnerSettings } from '../../hooks/useOwnerSettings';
 import { useUpdateSettings } from '../../hooks/useUpdateSettings';
+import { ApiError } from '../../api/client';
+
+interface ValidationErrorPayload {
+  message?: string;
+  details?: string[];
+}
 
 export function OwnerSettingsForm() {
   const { data: settings, isLoading } = useOwnerSettings();
@@ -35,6 +41,12 @@ export function OwnerSettingsForm() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings]);
+
+  const errorPayload = updateMutation.error instanceof ApiError
+    ? updateMutation.error.data as ValidationErrorPayload
+    : null;
+  const errorMessage = errorPayload?.message ?? (updateMutation.isError ? 'Ошибка сохранения' : null);
+  const errorDetails = errorPayload?.details ?? [];
 
   if (isLoading) {
     return <Center py="xl"><Loader /></Center>;
@@ -69,9 +81,10 @@ export function OwnerSettingsForm() {
           {...form.getInputProps('workDayEnd')}
         />
 
-        {updateMutation.isError && (
-          <Text c="red" size="sm">Ошибка сохранения</Text>
-        )}
+        {errorMessage && <Text c="red" size="sm">{errorMessage}</Text>}
+        {errorDetails.map((detail) => (
+          <Text key={detail} c="red" size="sm">{detail}</Text>
+        ))}
         {updateMutation.isSuccess && (
           <Text c="green" size="sm">Сохранено</Text>
         )}
