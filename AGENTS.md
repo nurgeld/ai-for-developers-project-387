@@ -18,6 +18,7 @@ make dev             # Frontend dev server
 make build           # TS compile + Vite build
 make lint            # ESLint
 make test-backend    # Run backend pytest
+make test-e2e        # Run Playwright E2E tests
 make compile-api     # TypeSpec → OpenAPI
 make generate-types  # OpenAPI → TS types
 ```
@@ -120,6 +121,11 @@ backend/app/
 ├── time_utils.py     # Time parsing and UTC utilities
 ├── routers/          # settings, event_types, slots, bookings, owner_settings
 └── tests/            # pytest: conftest.py, test_services.py, test_api.py
+tests/e2e/
+├── scenarios.md      # E2E user scenario specifications
+├── fixtures/         # Shared test fixtures
+├── specs/            # Playwright test specs
+└── playwright.config.ts
 .opencode/tools/
 ├── seed-test-data.ts # Custom tool for test data
 └── run-seed.js       # Standalone seed script
