@@ -19,8 +19,11 @@ make build           # TS compile + Vite build
 make lint            # ESLint
 make test-backend    # Run backend pytest
 make test-e2e        # Run Playwright E2E tests
+make test-e2e-ui     # Run E2E tests with UI mode
 make compile-api     # TypeSpec → OpenAPI
 make generate-types  # OpenAPI → TS types
+make mcp-playwright  # Start Playwright MCP server
+make mcp-chrome      # Start Chrome DevTools MCP server
 ```
 
 ---
@@ -42,6 +45,23 @@ Populates the Calendar API with test data:
 **Options**: `ownerName`, `force`, `bookingGuestName`, `bookingGuestEmail`, `bookingDurationMinutes`, `ensureBookingForToday`
 
 **Standalone script**: `.opencode/tools/run-seed.js` — run with `node .opencode/tools/run-seed.js`
+
+---
+
+## MCP Servers
+
+Configured in `.opencode/mcp.json`:
+
+- **playwright** (`@playwright/mcp@latest`) - Browser automation tools
+- **chrome-devtools** (`chrome-devtools-mcp@latest`) - Chrome debugging integration
+
+**Usage**:
+```bash
+make mcp-playwright    # Start Playwright MCP
+make mcp-chrome        # Start Chrome DevTools MCP
+```
+
+For OpenCode IDE: Configuration is automatically loaded from `.opencode/mcp.json`.
 
 ---
 
@@ -126,9 +146,11 @@ tests/e2e/
 ├── fixtures/         # Shared test fixtures
 ├── specs/            # Playwright test specs
 └── playwright.config.ts
-.opencode/tools/
-├── seed-test-data.ts # Custom tool for test data
-└── run-seed.js       # Standalone seed script
+.opencode/
+├── mcp.json          # MCP server configuration
+└── tools/
+    ├── seed-test-data.ts # Custom tool for test data
+    └── run-seed.js       # Standalone seed script
 ```
 
 ---

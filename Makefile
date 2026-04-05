@@ -5,9 +5,13 @@ help:
 	@echo "  make build          - Build for production"
 	@echo "  make lint           - Run ESLint"
 	@echo "  make test-backend   - Run backend pytest"
+	@echo "  make test-e2e       - Run Playwright E2E suite"
+	@echo "  make test-e2e-ui    - Run E2E tests with UI mode"
 	@echo "  make mock-api       - Start Prism mock server"
 	@echo "  make compile-api    - Compile TypeSpec to OpenAPI"
 	@echo "  make generate-types - Generate TS types from OpenAPI"
+	@echo "  make mcp-playwright - Start Playwright MCP server"
+	@echo "  make mcp-chrome     - Start Chrome DevTools MCP server"
 	@echo "  make clean          - Remove build artifacts"
 	@echo "  make stop           - Stop all services (vite, prism, uvicorn)"
 	@echo "  make restart        - Stop all and start with real backend"
@@ -62,6 +66,22 @@ lint:
 	npm run lint
 test-backend:
 	cd backend && poetry run pytest
+test-e2e:
+	@set -e; \
+	trap '$(MAKE) --no-print-directory stop' EXIT; \
+	$(MAKE) --no-print-directory restart; \
+	echo "Running Playwright E2E tests..."; \
+	npm run test:e2e
+test-e2e-ui:
+	@set -e; \
+	trap '$(MAKE) --no-print-directory stop' EXIT; \
+	$(MAKE) --no-print-directory restart; \
+	echo "Running Playwright E2E tests with UI..."; \
+	npm run test:e2e:ui
+mcp-playwright:
+	npx -y @playwright/mcp@latest
+mcp-chrome:
+	npx -y chrome-devtools-mcp@latest
 mock-api:
 	npm run mock:api
 compile-api:

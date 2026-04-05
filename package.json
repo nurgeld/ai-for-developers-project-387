@@ -11,7 +11,14 @@
     "preview": "vite preview",
     "compile:api": "tsp compile api/main.tsp --emit @typespec/openapi3 && cp tsp-output/@typespec/openapi3/openapi.yaml src/api/openapi.json",
     "generate:types": "openapi-typescript src/api/openapi.json -o src/api/generated.ts",
-    "mock:api": "prism mock src/api/openapi.json -p 4010"
+    "mock:api": "prism mock src/api/openapi.json -p 4010",
+    "test:e2e": "playwright test --config tests/e2e/playwright.config.ts",
+    "test:e2e:headed": "playwright test --config tests/e2e/playwright.config.ts --headed",
+    "test:e2e:ui": "playwright test --config tests/e2e/playwright.config.ts --ui",
+    "test:e2e:install": "playwright install chromium",
+    "test:e2e:install:deps": "playwright install --with-deps chromium",
+    "mcp:playwright": "npx -y @playwright/mcp@latest",
+    "mcp:chrome": "npx -y chrome-devtools-mcp@latest"
   },
   "dependencies": {
     "@mantine/core": "^9.0.0",
@@ -32,6 +39,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
+    "@playwright/test": "^1.59.1",
     "@stoplight/prism-cli": "^5.8.0",
     "@types/node": "^24.12.0",
     "@types/react": "^19.2.14",

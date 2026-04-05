@@ -1,5 +1,7 @@
 # Booking System
 
+[![Hexlet Check](https://github.com/nurgeld/ai-for-developers-project-386/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/nurgeld/ai-for-developers-project-386/actions)
+
 A calendar-based booking application for event scheduling. The system supports two roles: calendar owner and guests.
 
 ## Overview
@@ -30,7 +32,7 @@ A calendar-based booking application for event scheduling. The system supports t
 - **Frontend**: React 19, TypeScript, Vite, Mantine UI, TanStack Router, TanStack Query
 - **Backend**: Python 3.12, FastAPI, Pydantic, Poetry
 - **API Contract**: TypeSpec (`api/main.tsp`)
-- **Testing**: pytest
+- **Testing**: pytest, Playwright E2E
 
 ## Getting Started
 
@@ -60,11 +62,49 @@ cd backend
 poetry run pytest
 ```
 
+### E2E Tests
+
+End-to-end tests use Playwright and cover all user scenarios (30 tests total):
+
+```bash
+# Run all E2E tests (auto-starts/stops services)
+npm run test:e2e
+
+# Run with UI mode for debugging
+npm run test:e2e:ui
+
+# Run in headed mode (visible browser)
+npm run test:e2e:headed
+
+# Install Playwright browsers
+npm run test:e2e:install
+```
+
+### MCP Servers
+
+The project includes MCP (Model Context Protocol) servers for enhanced AI tooling:
+
+- **Playwright MCP** (`@playwright/mcp`) - Browser automation tools
+- **Chrome DevTools MCP** (`chrome-devtools-mcp`) - Chrome debugging integration
+
+Start manually:
+```bash
+make mcp-playwright    # Start Playwright MCP
+make mcp-chrome        # Start Chrome DevTools MCP
+```
+
+Or configure in your IDE (configured in `.opencode/mcp.json` for OpenCode).
+
 ### Using Makefile
 
 ```bash
 make stop            # Stop all services (vite, prism, uvicorn)
 make restart         # Stop all and start with real backend
+make restart-mock    # Stop all and start with mock API (background)
+make test-e2e        # Run E2E tests with auto-start/stop
+make test-e2e-ui     # Run E2E tests with UI mode
+make mcp-playwright  # Start Playwright MCP server
+make mcp-chrome      # Start Chrome DevTools MCP server
 make mock-api        # Start Prism mock server only
 ```
 
@@ -159,6 +199,16 @@ backend/
     ├── test_services.py
     └── test_api.py
 
+tests/e2e/
+├── specs/        # E2E test specifications (Playwright)
+├── fixtures/     # Test fixtures and helpers
+├── playwright.config.ts
+└── scenarios.md  # E2E test scenarios documentation
+
 api/
 └── main.tsp      # TypeSpec API contract (source of truth)
+
+.opencode/
+├── mcp.json      # MCP server configuration
+└── tools/        # OpenCode custom tools
 ```
