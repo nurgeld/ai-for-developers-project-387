@@ -286,7 +286,7 @@ async function main() {
   if (mapped.status === "failed") {
     process.exit(EXIT_CODES.DEPLOY_FAILED);
   } else if (mapped.status === "deploying") {
-    process.exit(EXIT_CODES.SUCCESS);
+    process.exit(EXIT_CODES.TIMEOUT);
   } else {
     process.exit(EXIT_CODES.SUCCESS);
   }

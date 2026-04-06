@@ -3,7 +3,7 @@ import { tool } from "@opencode-ai/plugin";
 const RENDER_API = "https://api.render.com/v1";
 
 const DEPLOY_STATUS_MAP: Record<string, { status: string; label: string }> = {
-  live: { status: "deployed", label: "Deployed" },
+  succeeded: { status: "deployed", label: "Deployed" },
   build_failed: { status: "failed", label: "Failed" },
   in_progress: { status: "deploying", label: "Deploying" },
   canceled: { status: "canceled", label: "Canceled" },
@@ -106,17 +106,21 @@ export default tool({
     };
 
     const apiRequest = async (path: string): Promise<{ status: number; data: unknown }> => {
-      const response = await fetch(`${RENDER_API}${path}`, { headers });
-      const text = await response.text();
-      let data: unknown = null;
-      if (text) {
-        try {
-          data = JSON.parse(text);
-        } catch {
-          data = text;
+      try {
+        const response = await fetch(`${RENDER_API}${path}`, { headers });
+        const text = await response.text();
+        let data: unknown = null;
+        if (text) {
+          try {
+            data = JSON.parse(text);
+          } catch {
+            data = text;
+          }
         }
+        return { status: response.status, data };
+      } catch (err) {
+        return { status: 0, data: { error: "Network error", message: err instanceof Error ? err.message : "Unknown error" } };
       }
-      return { status: response.status, data };
     };
 
     // 1. Find service by name
