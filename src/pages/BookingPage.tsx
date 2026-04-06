@@ -295,7 +295,7 @@ export function BookingPage({ eventTypeId }: BookingPageProps) {
                   </Text>
                 )}
                 <ScrollArea.Autosize
-                  mah="calc(100vh - 20rem)"
+                  mah="calc(100vh - 16rem)"
                   offsetScrollbars
                   scrollbarSize={6}
                 >

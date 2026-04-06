@@ -35,7 +35,7 @@ export function BookingSummary({
           <Text size="xs" c="dimmed">Выбранная дата</Text>
           <Text fw={500}>
             {selectedDate
-              ? dayjs(selectedDate).locale('ru').format('dddd, D MMMM')
+              ? dayjs(selectedDate).format('dddd, D MMMM')
               : 'Дата не выбрана'}
           </Text>
         </Paper>

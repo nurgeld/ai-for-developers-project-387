@@ -348,7 +348,7 @@ export function formatBookingCardTime(slot: Pick<Slot, 'startAt'>): string {
 }
 
 export function formatCalendarDayLabel(isoDate: string): string {
-  return dayjs.utc(isoDate).locale('en').format('D MMMM YYYY');
+  return dayjs.utc(isoDate).format('D MMMM YYYY');
 }
 
 export function getSlotStatusButton(page: Page, slot: Pick<Slot, 'startAt' | 'endAt'>, status: 'Свободно' | 'Занято') {
