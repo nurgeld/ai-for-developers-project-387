@@ -19,11 +19,13 @@ make build           # TS compile + Vite build
 make lint            # ESLint
 make test-backend    # Run backend pytest
 make test-e2e        # Run Playwright E2E tests
-make test-e2e-ui     # Run E2E tests with UI mode
+make test-e2e-ui     # Run Playwright E2E tests with UI mode
 make compile-api     # TypeSpec → OpenAPI
 make generate-types  # OpenAPI → TS types
 make mcp-playwright  # Start Playwright MCP server
 make mcp-chrome      # Start Chrome DevTools MCP server
+make check-render    # Check Render deploy status (wait for completion)
+make check-render-quick - Check Render deploy status (one-shot, JSON)
 ```
 
 ---
@@ -45,6 +47,42 @@ Populates the Calendar API with test data:
 **Options**: `ownerName`, `force`, `bookingGuestName`, `bookingGuestEmail`, `bookingDurationMinutes`, `ensureBookingForToday`
 
 **Standalone script**: `.opencode/tools/run-seed.js` — run with `node .opencode/tools/run-seed.js`
+
+---
+
+## Render Deployment Check
+
+Check the deployment status of your Render service `nurgeldy-calendar-booking`.
+
+**Environment setup**:
+```bash
+export RENDER_API_KEY=rnd_your_api_key_here
+# Optional: export RENDER_SERVICE_NAME=your-service-name
+```
+
+**Usage**:
+```bash
+# Check status and wait for deployment to complete (max 5 min)
+make check-render
+
+# One-shot check (returns JSON for CI/CD)
+make check-render-quick
+
+# Via OpenCode IDE
+@render-deploy-check wait=true timeout=300
+```
+
+**Exit codes**:
+- `0` = Deployed successfully ✅
+- `1` = Deployment failed ❌
+- `2` = Timeout waiting for deploy ⏱️
+- `3` = Service not found 🔍
+- `4` = API key not set
+- `5` = API error
+
+**Output formats**:
+- `make check-render`: Human-readable text with emojis and details
+- `make check-render-quick`: Machine-readable JSON for CI/CD pipelines
 
 ---
 
@@ -150,7 +188,9 @@ tests/e2e/
 ├── mcp.json          # MCP server configuration
 └── tools/
     ├── seed-test-data.ts # Custom tool for test data
-    └── run-seed.js       # Standalone seed script
+    ├── run-seed.js       # Standalone seed script
+    ├── render-deploy-check.ts # MCP tool for Render deploy status
+    └── run-render-check.js   # Standalone CLI script for Render deploy check
 ```
 
 ---

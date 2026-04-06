@@ -11,10 +11,13 @@ node_modules
 dist
 dist-ssr
 *.local
+playwright-report/
+test-results/
+browsers/
 
 # Editor directories and files
 .vscode/*
-!.vscode/extensions.json
+! .vscode/extensions.json
 .idea
 .DS_Store
 *.suo
@@ -37,3 +40,8 @@ __pycache__/
 coverage.xml
 .venv/
 venv/
+
+# Environment variables
+.env
+.env.local
+.env.*.local

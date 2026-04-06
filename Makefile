@@ -6,12 +6,14 @@ help:
 	@echo "  make lint           - Run ESLint"
 	@echo "  make test-backend   - Run backend pytest"
 	@echo "  make test-e2e       - Run Playwright E2E suite"
-	@echo "  make test-e2e-ui    - Run E2E tests with UI mode"
+	@echo "  make test-e2e-ui    - Run Playwright E2E tests with UI mode"
+	@echo "  make mcp-playwright - Start Playwright MCP server"
+	@echo "  make mcp-chrome     - Start Chrome DevTools MCP server"
+	@echo "  make check-render   - Check Render deploy status (wait for completion)"
+	@echo "  make check-render-quick - Check Render deploy status (one-shot, JSON)"
 	@echo "  make mock-api       - Start Prism mock server"
 	@echo "  make compile-api    - Compile TypeSpec to OpenAPI"
 	@echo "  make generate-types - Generate TS types from OpenAPI"
-	@echo "  make mcp-playwright - Start Playwright MCP server"
-	@echo "  make mcp-chrome     - Start Chrome DevTools MCP server"
 	@echo "  make clean          - Remove build artifacts"
 	@echo "  make stop           - Stop all services (vite, prism, uvicorn)"
 	@echo "  make restart        - Stop all and start with real backend"
@@ -33,7 +35,16 @@ restart-mock: stop
 	@sleep 2
 	@echo "Starting frontend on port 5173..."
 	$(MAKE) --no-print-directory _start-vite-mock
-
+check-render:
+ifndef RENDER_API_KEY
+	$(error RENDER_API_KEY is not set. Get it from https://dashboard.render.com/settings#api-keys)
+endif
+	@node .opencode/tools/run-render-check.js --wait --timeout 300
+check-render-quick:
+ifndef RENDER_API_KEY
+	$(error RENDER_API_KEY is not set)
+endif
+	@node .opencode/tools/run-render-check.js --format json
 _start-backend:
 	cd backend && nohup poetry run python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 > /tmp/backend.log 2>&1 &
 _start-mock-api:
