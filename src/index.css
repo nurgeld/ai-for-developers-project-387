@@ -4,3 +4,16 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Убрать синюю обводку при фокусе на днях календаря */
+.mantine-DatePicker-day:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Увеличить размер ячеек календаря */
+.mantine-DatePicker-day {
+  width: 54px !important;
+  height: 54px !important;
+  font-size: 16px !important;
+}

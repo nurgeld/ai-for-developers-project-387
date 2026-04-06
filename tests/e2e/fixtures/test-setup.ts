@@ -408,6 +408,7 @@ export const test = base.extend<BrowserIssueFixtures>({
       );
     });
 
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     await use(page);
 
     const expectedConsolePatterns = [
@@ -434,6 +435,7 @@ export const test = base.extend<BrowserIssueFixtures>({
 
   api: async ({ request }, use, testInfo) => {
     const apiBaseUrl = String(testInfo.config.metadata.apiURL ?? 'http://127.0.0.1:8000/api');
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     await use(createApiHelpers(request, apiBaseUrl));
   },
 });

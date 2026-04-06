@@ -17,10 +17,7 @@ async function openCreateModal(page: Page) {
   await expect(page.getByRole('dialog').getByText('Новый тип события')).toBeVisible();
 }
 
-async function chooseDuration(page: Page, label: '15 минут' | '30 минут') {
-  await page.getByRole('combobox', { name: 'Длительность' }).click();
-  await page.getByRole('option', { name: label }).click();
-}
+
 
 test('T19 opens create event type modal', async ({ page }) => {
   await openSettingsTab(page);

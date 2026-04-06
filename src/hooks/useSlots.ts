@@ -10,5 +10,6 @@ export function useSlots(
     queryKey: ['slots', eventTypeId, startDate, endDate],
     queryFn: () => listSlots({ eventTypeId, startDate, endDate }),
     enabled: !!eventTypeId && !!startDate && !!endDate,
+    placeholderData: (previousData) => previousData,
   });
 }

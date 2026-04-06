@@ -49,38 +49,28 @@ export function BookingPage({ eventTypeId }: BookingPageProps) {
 
   const createBooking = useCreateBooking();
 
-  // Month range for slot counters
+  // Month range for slot counters - dynamic based on current month view
   const monthStart = dayjs(currentMonth).startOf('month').format('YYYY-MM-DD');
   const monthEnd = dayjs(currentMonth).endOf('month').format('YYYY-MM-DD');
 
-  // Day range for slot list
-  const dayStr = selectedDate ? dayjs(selectedDate).format('YYYY-MM-DD') : '';
-
   const { data: monthSlots } = useSlots(eventTypeId, monthStart, monthEnd);
-  const {
-    data: daySlots,
-    refetch: refetchDaySlots,
-  } = useSlots(
-    eventTypeId,
-    dayStr,
-    dayStr,
-  );
 
   const visibleDaySlots = useMemo(() => {
-    if (!selectedDate || !daySlots) return [];
+    if (!selectedDate || !monthSlots) return [];
 
     const selectedDay = dayjs(selectedDate).format('YYYY-MM-DD');
     const now = dayjs();
 
-    return daySlots.filter(
+    return monthSlots.filter(
       (slot) => {
-        if (dayjs.utc(slot.startAt).format('YYYY-MM-DD') !== selectedDay) {
+        const slotDay = dayjs.utc(slot.startAt).format('YYYY-MM-DD');
+        if (slotDay !== selectedDay) {
           return false;
         }
         return dayjs.utc(slot.startAt).isAfter(now);
       },
     );
-  }, [daySlots, selectedDate]);
+  }, [monthSlots, selectedDate]);
 
   const freeCount = useMemo(() => {
     return visibleDaySlots.filter((slot) => !slot.isBooked).length;
@@ -111,6 +101,14 @@ export function BookingPage({ eventTypeId }: BookingPageProps) {
     }
   }, []);
 
+  const refetchSlots = useCallback(async () => {
+    await queryClient.invalidateQueries({
+      queryKey: ['slots', eventTypeId, monthStart, monthEnd],
+    });
+    // Return current monthSlots after invalidation
+    return { data: monthSlots };
+  }, [queryClient, eventTypeId, monthStart, monthEnd, monthSlots]);
+
   const handleContinue = useCallback(async () => {
     if (!calendarSelectedSlot || !selectedDate || !selectedSlot) {
       return;
@@ -121,20 +119,20 @@ export function BookingPage({ eventTypeId }: BookingPageProps) {
     let fetched;
 
     try {
-      fetched = await refetchDaySlots();
+      fetched = await refetchSlots();
     } catch {
       setBookingError('Не удалось обновить доступные слоты. Попробуйте еще раз.');
       return;
     }
 
-    const latestSlots = fetched.data ?? daySlots ?? [];
+    const latestSlots = fetched.data ?? monthSlots ?? [];
     const selectedDay = dayjs(selectedDate).format('YYYY-MM-DD');
     const latestDaySlots = latestSlots.filter(
-      (slot) => dayjs.utc(slot.startAt).format('YYYY-MM-DD') === selectedDay,
+      (slot: Slot) => dayjs.utc(slot.startAt).format('YYYY-MM-DD') === selectedDay,
     );
 
     const stillFree = latestDaySlots.some(
-      (slot) => slot.startAt === selectedSlot.startAt && !slot.isBooked,
+      (slot: Slot) => slot.startAt === selectedSlot.startAt && !slot.isBooked,
     );
 
     if (!stillFree) {
@@ -144,7 +142,7 @@ export function BookingPage({ eventTypeId }: BookingPageProps) {
     }
 
     setStep('form');
-  }, [calendarSelectedSlot, daySlots, refetchDaySlots, selectedDate, selectedSlot]);
+  }, [calendarSelectedSlot, monthSlots, refetchSlots, selectedDate, selectedSlot]);
 
   const handleBack = useCallback(() => {
     setStep('calendar');
@@ -162,19 +160,19 @@ export function BookingPage({ eventTypeId }: BookingPageProps) {
       let latest;
 
       try {
-        latest = (await refetchDaySlots()).data;
+        latest = (await refetchSlots()).data;
       } catch {
         setBookingError('Не удалось проверить доступность слота. Попробуйте еще раз.');
         return;
       }
 
-      const latestList = latest ?? daySlots ?? [];
+      const latestList = latest ?? monthSlots ?? [];
       const selectedDay = dayjs(selectedDate).format('YYYY-MM-DD');
       const latestDaySlots = latestList.filter(
-        (slot) => dayjs.utc(slot.startAt).format('YYYY-MM-DD') === selectedDay,
+        (slot: Slot) => dayjs.utc(slot.startAt).format('YYYY-MM-DD') === selectedDay,
       );
       const liveSlot = latestDaySlots.find(
-        (slot) => slot.startAt === selectedSlot.startAt && !slot.isBooked,
+        (slot: Slot) => slot.startAt === selectedSlot.startAt && !slot.isBooked,
       );
 
       if (!liveSlot) {
@@ -212,9 +210,9 @@ export function BookingPage({ eventTypeId }: BookingPageProps) {
       );
     },
     [
-      daySlots,
+      monthSlots,
       eventTypeId,
-      refetchDaySlots,
+      refetchSlots,
       queryClient,
       selectedDate,
       selectedSlot,

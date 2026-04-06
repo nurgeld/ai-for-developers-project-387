@@ -45,76 +45,84 @@ export function SlotCalendar({
         const nextDate = dayjs(val);
         onChange(nextDate.isBefore(today, 'day') ? null : nextDate.toDate());
       }}
-      onDateChange={(date) => {
-        onMonthChange(dayjs(date).toDate());
+      onDateChange={(dateStr) => {
+        onMonthChange(dayjs(dateStr).toDate());
       }}
       locale="ru"
-      size="lg"
+      size="xl"
       firstDayOfWeek={1}
       minDate={today.format('YYYY-MM-DD')}
       excludeDate={(date) => dayjs(date).isBefore(today, 'day')}
       styles={{
         calendarHeader: {
-          fontWeight: 500,
-          fontSize: '15px',
-          color: 'var(--mantine-color-gray-7)',
+          fontWeight: 600,
+          fontSize: '18px',
+          color: 'var(--mantine-color-gray-8)',
           textTransform: 'capitalize',
-          marginBottom: 8,
+          marginBottom: 12,
         },
         calendarHeaderControl: {
-          color: 'var(--mantine-color-gray-6)',
+          color: 'var(--mantine-color-gray-7)',
           '&:hover': {
             backgroundColor: 'var(--mantine-color-gray-0)',
           },
         },
         weekday: {
-          fontWeight: 500,
-          fontSize: '12px',
-          color: 'var(--mantine-color-gray-5)',
-          textTransform: 'lowercase',
+          fontWeight: 600,
+          fontSize: '14px',
+          color: 'var(--mantine-color-gray-6)',
+          textTransform: 'capitalize',
         },
         day: {
-          height: 'auto',
-          width: 'auto',
-          padding: 2,
           borderRadius: '50%',
-          aspectRatio: '1 / 1',
           '&[dataSelected]': {
-            backgroundColor: 'var(--mantine-color-orange-5)',
+            backgroundColor: 'var(--mantine-color-orange-6)',
             color: 'white',
           },
           '&[dataSelected]:hover': {
-            backgroundColor: 'var(--mantine-color-orange-6)',
-          },
-          '&:focus': {
-            outline: 0,
-            boxShadow: 'none',
+            backgroundColor: 'var(--mantine-color-orange-7)',
           },
         },
+        monthCell: {
+          padding: 4,
+        },
+      }}
+      getDayProps={(date) => {
+        const day = dayjs(date);
+        const key = day.format('YYYY-MM-DD');
+        const isSelected = selectedKey === key;
+        const isToday = todayKey === key;
+        const isPast = day.isBefore(today, 'day');
+        const count = freeCountByDate[key];
+        const hasAvailability = count !== undefined && count > 0 && !isPast;
+
+        return {
+          style: {
+            border: isToday ? '2px solid var(--mantine-color-orange-6)' : undefined,
+            backgroundColor: isSelected ? 'var(--mantine-color-orange-6)' : undefined,
+            color: isSelected ? 'white' : isPast ? 'var(--mantine-color-gray-4)' : 'var(--mantine-color-gray-9)',
+            fontWeight: isToday || isSelected ? 600 : 500,
+          },
+          // Custom data attribute for renderDay to check availability
+          'data-availability': hasAvailability ? 'true' : 'false',
+        };
       }}
       renderDay={(date) => {
         const day = dayjs(date);
         const key = day.format('YYYY-MM-DD');
         const count = freeCountByDate[key];
         const isSelected = selectedKey === key;
-        const isToday = todayKey === key;
         const isPast = day.isBefore(today, 'day');
         const hasAvailability = count !== undefined && count > 0 && !isPast;
 
         const cellStyle: React.CSSProperties = {
           display: 'flex',
-          flexDirection: 'column',
+          flexDirection: 'column' as const,
           alignItems: 'center',
           justifyContent: 'center',
-          height: '100%',
-          width: '100%',
-          borderRadius: '50%',
-          border: isToday ? '1px solid var(--mantine-color-orange-5)' : undefined,
-          backgroundColor: isSelected ? 'var(--mantine-color-orange-5)' : undefined,
-          color: isSelected ? 'white' : isPast ? 'var(--mantine-color-gray-4)' : 'var(--mantine-color-gray-8)',
-          fontSize: '14px',
-          fontWeight: isToday || isSelected ? 500 : 400,
-          transition: 'all 0.15s ease',
+          fontSize: '16px',
+          lineHeight: 1,
+          paddingTop: 2,
         };
 
         return (
@@ -123,11 +131,11 @@ export function SlotCalendar({
             {hasAvailability && !isSelected && (
               <Box
                 style={{
-                  width: 4,
-                  height: 4,
+                  width: 6,
+                  height: 6,
                   borderRadius: '50%',
-                  backgroundColor: 'var(--mantine-color-green-5)',
-                  marginTop: 2,
+                  backgroundColor: 'var(--mantine-color-green-6)',
+                  marginTop: 3,
                 }}
               />
             )}
