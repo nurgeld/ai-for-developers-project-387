@@ -343,8 +343,9 @@ export function formatSlotRange(slot: Pick<Slot, 'startAt' | 'endAt'>): string {
   return `${dayjs.utc(slot.startAt).format('HH:mm')} - ${dayjs.utc(slot.endAt).format('HH:mm')}`;
 }
 
+// Use the same format as BookingCard.tsx: DD MMMM YYYY, HH:mm (e.g., "07 апреля 2026, 16:00")
 export function formatBookingCardTime(slot: Pick<Slot, 'startAt'>): string {
-  return dayjs.utc(slot.startAt).format('YYYY-MM-DD HH:mm');
+  return dayjs.utc(slot.startAt).format('D MMMM YYYY, HH:mm');
 }
 
 export function formatCalendarDayLabel(isoDate: string): string {

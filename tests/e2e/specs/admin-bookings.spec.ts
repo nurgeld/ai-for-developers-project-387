@@ -16,8 +16,8 @@ test('T13 shows bookings tab content by default', async ({ page, api }) => {
   await expect(page.getByRole('tab', { name: 'Бронирования' })).toHaveAttribute('aria-selected', 'true');
   await expect(page.getByText(lookup.booking.guestName)).toBeVisible();
   await expect(page.getByText(lookup.booking.guestEmail)).toBeVisible();
-  await expect(page.getByText(`Слот: ${formatBookingCardTime(lookup.slot)}`)).toBeVisible();
-  await expect(page.getByText(`Тип: ${lookup.booking.eventTypeName}`)).toBeVisible();
+  await expect(page.getByText(formatBookingCardTime(lookup.slot))).toBeVisible();
+  await expect(page.getByText(lookup.booking.eventTypeName)).toBeVisible();
   await expect(page.getByRole('button', { name: 'Отменить' })).toBeVisible();
 });
 

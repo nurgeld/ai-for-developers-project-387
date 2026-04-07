@@ -17,7 +17,7 @@ async function openBookingPageForFirstAvailableSlot(
 ) {
   const lookup = await api.findAvailableSlot({ durationMinutes: 15 });
   await page.goto(`/book/${lookup.eventType.id}`);
-  await expect(page.getByRole('heading', { name: 'Запись на звонок', level: 2 })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Запись на встречу', level: 2 })).toBeVisible();
   return lookup;
 }
 
@@ -58,7 +58,7 @@ test('T02 navigates from landing page to event types', async ({ page, api }) => 
   await page.locator('main').getByRole('link', { name: /Записаться/ }).click();
 
   await expect(page).toHaveURL(/\/book$/);
-  await expect(page.getByRole('heading', { name: 'Выберите тип события', level: 2 })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Выберите тип встречи', level: 2 })).toBeVisible();
   await expect(page.getByText(settings.name)).toBeVisible();
   await expect(page.getByText(/мин$/).first()).toBeVisible();
 });
@@ -70,9 +70,9 @@ test('T03 opens booking page from event type card', async ({ page, api }) => {
   await page.getByText(eventType.name).click();
 
   await expect(page).toHaveURL(new RegExp(`/book/${eventType.id}$`));
-  await expect(page.getByRole('heading', { name: 'Запись на звонок', level: 2 })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Календарь', level: 4 })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Статус слотов', level: 4 })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Запись на встречу', level: 2 })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Выбрать дату', level: 4 })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Выбрать время', level: 4 })).toBeVisible();
   await expect(page.getByText(eventType.name)).toBeVisible();
 });
 
@@ -98,7 +98,7 @@ test('T06 shows booking form after continue', async ({ page, api }) => {
 
   await expect(page.getByRole('textbox', { name: 'Имя' })).toBeVisible();
   await expect(page.getByRole('textbox', { name: 'Электронная почта' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Подтвердить запись' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Подтвердить' })).toBeVisible();
 });
 
 test('T07 rejects invalid booking form input', async ({ page, api }) => {
@@ -106,7 +106,7 @@ test('T07 rejects invalid booking form input', async ({ page, api }) => {
 
   await page.getByRole('textbox', { name: 'Имя' }).fill('А');
   await page.getByRole('textbox', { name: 'Электронная почта' }).fill('abc');
-  await page.getByRole('button', { name: 'Подтвердить запись' }).click();
+  await page.getByRole('button', { name: 'Подтвердить' }).click();
 
   await expect(page.getByText(/Минимум 2/i)).toBeVisible();
   await expect(page.getByText(/email/i)).toBeVisible();
@@ -122,10 +122,10 @@ test('T08 accepts valid booking form input and shows success', async ({ page, ap
 
   await page.getByRole('textbox', { name: 'Имя' }).fill('Тест Пользователь');
   await page.getByRole('textbox', { name: 'Электронная почта' }).fill('test@example.com');
-  await page.getByRole('button', { name: 'Подтвердить запись' }).click();
+  await page.getByRole('button', { name: 'Подтвердить' }).click();
 
   await expect((await bookingResponse).status()).toBe(200);
-  await expect(page.getByText('Бронь подтверждена. До встречи!')).toBeVisible();
+  await expect(page.getByText('Бронь подтверждена!')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Забронировать еще' })).toBeVisible();
 });
 
@@ -134,13 +134,13 @@ test('T09 returns to event types from success screen', async ({ page, api }) => 
 
   await page.getByRole('textbox', { name: 'Имя' }).fill('Тест Пользователь');
   await page.getByRole('textbox', { name: 'Электронная почта' }).fill('test@example.com');
-  await page.getByRole('button', { name: 'Подтвердить запись' }).click();
-  await expect(page.getByText('Бронь подтверждена. До встречи!')).toBeVisible();
+  await page.getByRole('button', { name: 'Подтвердить' }).click();
+  await expect(page.getByText('Бронь подтверждена!')).toBeVisible();
 
   await page.getByRole('button', { name: 'Забронировать еще' }).click();
 
   await expect(page).toHaveURL(/\/book$/);
-  await expect(page.getByRole('heading', { name: 'Выберите тип события', level: 2 })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Выберите тип встречи', level: 2 })).toBeVisible();
 });
 
 test('T10 returns to event types from calendar step', async ({ page, api }) => {
@@ -149,13 +149,13 @@ test('T10 returns to event types from calendar step', async ({ page, api }) => {
   await page.getByRole('button', { name: 'Назад' }).click();
 
   await expect(page).toHaveURL(/\/book$/);
-  await expect(page.getByRole('heading', { name: 'Выберите тип события', level: 2 })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Выберите тип встречи', level: 2 })).toBeVisible();
 });
 
 test('T11 returns from form to calendar while keeping selected time summary', async ({ page, api }) => {
   const lookup = await openBookingForm(page, api);
 
-  await page.getByRole('button', { name: 'Изменить' }).click();
+  await page.getByRole('button', { name: 'Назад' }).click();
 
   await expect(page.getByRole('button', { name: 'Продолжить' })).toBeVisible();
   await expect(page.getByRole('textbox', { name: 'Имя' })).toHaveCount(0);
@@ -180,9 +180,9 @@ test('T12 handles slot conflict on final submit', async ({ page, api }) => {
   await page.getByRole('textbox', { name: 'Имя' }).fill('Конфликт Тест');
   await page.getByRole('textbox', { name: 'Электронная почта' }).fill('conflict@example.com');
 
-  await page.getByRole('button', { name: 'Подтвердить запись' }).click();
+  await page.getByRole('button', { name: 'Подтвердить' }).click();
 
-  await expect(page.getByRole('heading', { name: 'Календарь', level: 4 })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Выбрать дату', level: 4 })).toBeVisible();
   await expect(page.getByText(/Выбранный слот уже занят/i)).toBeVisible();
   await expect(getSlotStatusButton(page, lookup.slot, 'Занято').first()).toBeDisabled();
 });

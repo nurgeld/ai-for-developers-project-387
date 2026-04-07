@@ -6,7 +6,7 @@ test.beforeEach(async ({ api }) => {
 
 test('T25 navigates from home to admin via header', async ({ page }) => {
   await page.goto('/');
-  await page.locator('header').getByRole('link', { name: 'Предстоящие события' }).click();
+  await page.locator('header').getByRole('link', { name: 'Управление' }).click();
 
   await expect(page).toHaveURL(/\/admin$/);
 });
