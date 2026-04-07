@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Stack, Text, Loader, Center } from '@mantine/core';
+import { Stack, Text, Loader, Center, Paper, ThemeIcon } from '@mantine/core';
+import { IconCalendarOff } from '@tabler/icons-react';
 import { useOwnerBookings } from '../../hooks/useOwnerBookings';
 import { useCancelBooking } from '../../hooks/useCancelBooking';
 import { BookingCard } from './BookingCard';
@@ -11,7 +12,11 @@ export function BookingList() {
   const errorMessage = error instanceof Error ? error.message : 'Ошибка загрузки бронирований';
 
   if (isLoading && !bookings) {
-    return <Center py="xl"><Loader /></Center>;
+    return (
+      <Center py="xl">
+        <Loader color="orange" />
+      </Center>
+    );
   }
 
   if (error && !bookings) {
@@ -19,7 +24,16 @@ export function BookingList() {
   }
 
   if (!bookings || bookings.length === 0) {
-    return <Text c="dimmed" ta="center" py="xl">Нет предстоящих событий</Text>;
+    return (
+      <Paper withBorder p="xl" radius="md">
+        <Stack align="center" gap="md">
+          <ThemeIcon size="xl" variant="light" color="gray">
+            <IconCalendarOff size={32} />
+          </ThemeIcon>
+          <Text c="dimmed" ta="center">Нет предстоящих событий</Text>
+        </Stack>
+      </Paper>
+    );
   }
 
   function handleCancel(id: string) {

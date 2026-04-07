@@ -4,7 +4,7 @@ import {
   createRouter,
   Outlet,
 } from '@tanstack/react-router';
-import { AppShell } from '@mantine/core';
+import { AppShell, Box } from '@mantine/core';
 import { Header } from './components/layout/Header';
 import { HomePage } from './pages/HomePage';
 import { EventTypesPage } from './pages/EventTypesPage';
@@ -14,28 +14,39 @@ import { AdminPage } from './pages/AdminPage';
 // Root layout
 const rootRoute = createRootRoute({
   component: () => (
-    <AppShell
-      header={{ height: 60 }}
-      padding="md"
-      styles={{
-        root: {
-          minHeight: '100vh',
-          background: 'linear-gradient(180deg, #d4edda 0%, #f0f9f0 45%, #ffffff 100%)',
-        },
-        header: {
-          backgroundColor: '#ffffff',
-          borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
-        },
-        main: { backgroundColor: 'transparent' },
+    <Box
+      style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(180deg, #e2e8f0 0%, #f1f5f9 50%, #f8fafc 100%)',
       }}
     >
-      <AppShell.Header>
-        <Header />
-      </AppShell.Header>
-      <AppShell.Main>
-        <Outlet />
-      </AppShell.Main>
-    </AppShell>
+      <AppShell
+        header={{ height: 60 }}
+        padding="md"
+        styles={{
+          root: {
+            backgroundColor: 'transparent',
+            minHeight: '100vh',
+          },
+          header: {
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            backdropFilter: 'blur(8px)',
+            borderBottom: '1px solid var(--mantine-color-gray-3)',
+          },
+          main: {
+            backgroundColor: 'transparent',
+            paddingTop: 'calc(var(--mantine-spacing-md) + 60px)',
+          },
+        }}
+      >
+        <AppShell.Header>
+          <Header />
+        </AppShell.Header>
+        <AppShell.Main>
+          <Outlet />
+        </AppShell.Main>
+      </AppShell>
+    </Box>
   ),
 });
 

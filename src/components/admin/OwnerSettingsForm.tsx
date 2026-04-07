@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
-import { Stack, TextInput, Button, Text, Loader, Center } from '@mantine/core';
+import { Stack, TextInput, Button, Text, Loader, Center, Paper, Group, Title, ThemeIcon } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { IconUser, IconPhoto, IconClock, IconCheck } from '@tabler/icons-react';
 import { useOwnerSettings } from '../../hooks/useOwnerSettings';
 import { useUpdateSettings } from '../../hooks/useUpdateSettings';
 import { ApiError } from '../../api/client';
@@ -49,54 +50,76 @@ export function OwnerSettingsForm() {
   const errorDetails = errorPayload?.details ?? [];
 
   if (isLoading) {
-    return <Center py="xl"><Loader /></Center>;
+    return (
+      <Center py="xl">
+        <Loader color="orange" />
+      </Center>
+    );
   }
 
   return (
-    <form onSubmit={form.onSubmit((values) => updateMutation.mutate(values))}>
-      <Stack gap="md">
-        <Text fw={600} size="lg">Настройки профиля</Text>
+    <Paper withBorder p="xl" radius="md">
+      <form onSubmit={form.onSubmit((values) => updateMutation.mutate(values))}>
+        <Stack gap="md">
+          <Group gap="xs">
+            <ThemeIcon size="md" variant="light" color="orange">
+              <IconUser size={18} />
+            </ThemeIcon>
+            <Title order={4}>Настройки профиля</Title>
+          </Group>
 
-        <TextInput
-          label="Имя"
-          placeholder="Имя владельца"
-          required
-          {...form.getInputProps('name')}
-        />
-        <TextInput
-          label="URL аватара"
-          placeholder="https://example.com/avatar.png"
-          {...form.getInputProps('avatarUrl')}
-        />
-        <TextInput
-          label="Начало рабочего дня"
-          placeholder="09:00"
-          required
-          {...form.getInputProps('workDayStart')}
-        />
-        <TextInput
-          label="Конец рабочего дня"
-          placeholder="18:00"
-          required
-          {...form.getInputProps('workDayEnd')}
-        />
+          <TextInput
+            label="Имя"
+            placeholder="Имя владельца"
+            required
+            leftSection={<IconUser size={16} />}
+            {...form.getInputProps('name')}
+          />
+          <TextInput
+            label="URL аватара"
+            placeholder="https://example.com/avatar.png"
+            leftSection={<IconPhoto size={16} />}
+            {...form.getInputProps('avatarUrl')}
+          />
 
-        {errorMessage && <Text c="red" size="sm">{errorMessage}</Text>}
-        {errorDetails.map((detail) => (
-          <Text key={detail} c="red" size="sm">{detail}</Text>
-        ))}
-        {updateMutation.isSuccess && (
-          <Text c="green" size="sm">Сохранено</Text>
-        )}
+          <Group grow>
+            <TextInput
+              label="Начало рабочего дня"
+              placeholder="09:00"
+              required
+              leftSection={<IconClock size={16} />}
+              {...form.getInputProps('workDayStart')}
+            />
+            <TextInput
+              label="Конец рабочего дня"
+              placeholder="18:00"
+              required
+              leftSection={<IconClock size={16} />}
+              {...form.getInputProps('workDayEnd')}
+            />
+          </Group>
 
-        <Button
-          type="submit"
-          color="orange"
-          loading={updateMutation.isPending}
-        >
-          Сохранить
-        </Button>
-      </Stack>
-    </form>
+          {errorMessage && <Text c="red" size="sm">{errorMessage}</Text>}
+          {errorDetails.map((detail) => (
+            <Text key={detail} c="red" size="sm">{detail}</Text>
+          ))}
+          {updateMutation.isSuccess && (
+            <Group gap="xs">
+              <IconCheck size={16} color="var(--mantine-color-green-5)" />
+              <Text c="green" size="sm">Сохранено</Text>
+            </Group>
+          )}
+
+          <Button
+            type="submit"
+            color="orange"
+            leftSection={<IconCheck size={16} />}
+            loading={updateMutation.isPending}
+          >
+            Сохранить
+          </Button>
+        </Stack>
+      </form>
+    </Paper>
   );
 }

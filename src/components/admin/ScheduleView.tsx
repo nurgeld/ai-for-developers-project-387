@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
-import { Center, Loader } from '@mantine/core';
+import { Center, Loader, Paper } from '@mantine/core';
 import { Schedule } from '@mantine/schedule';
 import { useOwnerBookings } from '../../hooks/useOwnerBookings';
 import { useOwnerSettings } from '../../hooks/useOwnerSettings';
 import { dayjs } from '../../lib/dayjs';
 
-// Mantine цвета для разных типов событий
+// Mantine colors for different event types
 const COLORS = [
   'blue',
   'cyan',
@@ -21,7 +21,7 @@ const COLORS = [
   'yellow',
 ] as const;
 
-// Простой хеш для детерминированного выбора цвета по eventTypeId
+// Simple hash for deterministic color selection by eventTypeId
 function getColorForEventType(eventTypeId: string): string {
   let hash = 0;
   for (let i = 0; i < eventTypeId.length; i++) {
@@ -49,7 +49,7 @@ export function ScheduleView() {
   if (isLoading && !bookings) {
     return (
       <Center py="xl">
-        <Loader />
+        <Loader color="orange" />
       </Center>
     );
   }
@@ -62,24 +62,26 @@ export function ScheduleView() {
     : '18:00:00';
 
   return (
-    <Schedule
-      events={events}
-      defaultView="month"
-      mode="static"
-      dayViewProps={{
-        startTime,
-        endTime,
-        intervalMinutes: 30,
-      }}
-      weekViewProps={{
-        startTime,
-        endTime,
-        withWeekendDays: false,
-      }}
-      monthViewProps={{
-        withWeekNumbers: true,
-        firstDayOfWeek: 1,
-      }}
-    />
+    <Paper withBorder p="md" radius="md">
+      <Schedule
+        events={events}
+        defaultView="month"
+        mode="static"
+        dayViewProps={{
+          startTime,
+          endTime,
+          intervalMinutes: 30,
+        }}
+        weekViewProps={{
+          startTime,
+          endTime,
+          withWeekendDays: false,
+        }}
+        monthViewProps={{
+          withWeekNumbers: true,
+          firstDayOfWeek: 1,
+        }}
+      />
+    </Paper>
   );
 }

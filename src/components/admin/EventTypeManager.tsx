@@ -10,8 +10,12 @@ import {
   Loader,
   Center,
   Modal,
+  Title,
+  ThemeIcon,
+  Badge,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { IconPlus, IconEdit, IconTrash, IconClock, IconListDetails, IconCheck, IconX } from '@tabler/icons-react';
 import { useEventTypes } from '../../hooks/useEventTypes';
 import {
   useCreateEventType,
@@ -53,7 +57,11 @@ export function EventTypeManager() {
   });
 
   if (isLoading) {
-    return <Center py="xl"><Loader /></Center>;
+    return (
+      <Center py="xl">
+        <Loader color="orange" />
+      </Center>
+    );
   }
 
   function handleCreate(values: { name: string; description: string; durationMinutes: string }) {
@@ -104,101 +112,141 @@ export function EventTypeManager() {
   }
 
   return (
-    <Stack gap="md">
-      <Group justify="space-between">
-        <Text fw={600} size="lg">Типы событий</Text>
-        <Button color="orange" size="xs" onClick={() => setCreateOpen(true)}>
-          Создать
-        </Button>
-      </Group>
+    <Paper withBorder p="xl" radius="md">
+      <Stack gap="md">
+        <Group justify="space-between">
+          <Group gap="xs">
+            <ThemeIcon size="md" variant="light" color="orange">
+              <IconListDetails size={18} />
+            </ThemeIcon>
+            <Title order={4}>Типы событий</Title>
+          </Group>
+          <Button
+            color="orange"
+            size="sm"
+            leftSection={<IconPlus size={16} />}
+            onClick={() => setCreateOpen(true)}
+          >
+            Создать
+          </Button>
+        </Group>
 
-      {eventTypes?.map((et) => (
-        <Paper key={et.id} withBorder p="md" radius="md">
-          {editingId === et.id ? (
-            <form onSubmit={editForm.onSubmit(handleUpdate)}>
-              <Stack gap="sm">
-                <TextInput
-                  label="Название"
-                  required
-                  {...editForm.getInputProps('name')}
-                />
-                <TextInput
-                  label="Описание"
-                  {...editForm.getInputProps('description')}
-                />
-                <Group>
-                  <Button type="submit" size="xs" color="orange" loading={updateMutation.isPending}>
-                    Сохранить
+        {eventTypes?.map((et) => (
+          <Paper key={et.id} withBorder p="md" radius="md">
+            {editingId === et.id ? (
+              <form onSubmit={editForm.onSubmit(handleUpdate)}>
+                <Stack gap="sm">
+                  <TextInput
+                    label="Название"
+                    required
+                    {...editForm.getInputProps('name')}
+                  />
+                  <TextInput
+                    label="Описание"
+                    {...editForm.getInputProps('description')}
+                  />
+                  <Group>
+                    <Button
+                      type="submit"
+                      size="sm"
+                      color="orange"
+                      leftSection={<IconCheck size={16} />}
+                      loading={updateMutation.isPending}
+                    >
+                      Сохранить
+                    </Button>
+                    <Button
+                      variant="subtle"
+                      size="sm"
+                      leftSection={<IconX size={16} />}
+                      onClick={() => setEditingId(null)}
+                    >
+                      Отмена
+                    </Button>
+                  </Group>
+                </Stack>
+              </form>
+            ) : (
+              <Group justify="space-between">
+                <div>
+                  <Group gap="xs">
+                    <Text fw={600}>{et.name}</Text>
+                    <Badge size="sm" variant="light" color="orange" leftSection={<IconClock size={12} />}>
+                      {et.durationMinutes} мин
+                    </Badge>
+                  </Group>
+                  <Text size="sm" c="dimmed">{et.description}</Text>
+                </div>
+                <Group gap="xs">
+                  <Button
+                    variant="subtle"
+                    size="xs"
+                    leftSection={<IconEdit size={14} />}
+                    onClick={() => startEdit(et)}
+                  >
+                    Изменить
                   </Button>
-                  <Button variant="subtle" size="xs" onClick={() => setEditingId(null)}>
-                    Отмена
+                  <Button
+                    variant="subtle"
+                    color="red"
+                    size="xs"
+                    leftSection={<IconTrash size={14} />}
+                    onClick={() => handleDelete(et.id)}
+                    loading={deleteMutation.isPending}
+                  >
+                    Удалить
                   </Button>
                 </Group>
-              </Stack>
-            </form>
-          ) : (
-            <Group justify="space-between">
-              <div>
-                <Text fw={600}>{et.name}</Text>
-                <Text size="sm" c="dimmed">{et.description}</Text>
-                <Text size="sm" c="dimmed">{et.durationMinutes} мин</Text>
-              </div>
-              <Group gap="xs">
-                <Button variant="subtle" size="xs" onClick={() => startEdit(et)}>
-                  Изменить
-                </Button>
-                <Button
-                  variant="subtle"
-                  color="red"
-                  size="xs"
-                  onClick={() => handleDelete(et.id)}
-                  loading={deleteMutation.isPending}
-                >
-                  Удалить
-                </Button>
               </Group>
-            </Group>
-          )}
-        </Paper>
-      ))}
+            )}
+          </Paper>
+        ))}
 
-      {apiError && <Text c="red" size="sm">{apiError}</Text>}
+        {apiError && <Text c="red" size="sm">{apiError}</Text>}
 
-      <Modal
-        opened={createOpen}
-        onClose={() => setCreateOpen(false)}
-        title="Новый тип события"
-      >
-        <form onSubmit={createForm.onSubmit(handleCreate)}>
-          <Stack gap="md">
-            <TextInput
-              label="Название"
-              placeholder="Встреча 15 минут"
-              required
-              {...createForm.getInputProps('name')}
-            />
-            <TextInput
-              label="Описание"
-              placeholder="Короткий тип события"
-              {...createForm.getInputProps('description')}
-            />
-            <Select
-              label="Длительность"
-              data={[
-                { value: '15', label: '15 минут' },
-                { value: '30', label: '30 минут' },
-              ]}
-              {...createForm.getInputProps('durationMinutes')}
-            />
+        <Modal
+          opened={createOpen}
+          onClose={() => setCreateOpen(false)}
+          title="Новый тип события"
+        >
+          <form onSubmit={createForm.onSubmit(handleCreate)}>
+            <Stack gap="md">
+              <TextInput
+                label="Название"
+                placeholder="Встреча 15 минут"
+                required
+                leftSection={<IconListDetails size={16} />}
+                {...createForm.getInputProps('name')}
+              />
+              <TextInput
+                label="Описание"
+                placeholder="Короткий тип события"
+                {...createForm.getInputProps('description')}
+              />
+              <Select
+                label="Длительность"
+                data={[
+                  { value: '15', label: '15 минут' },
+                  { value: '30', label: '30 минут' },
+                ]}
+                leftSection={<IconClock size={16} />}
+                {...createForm.getInputProps('durationMinutes')}
+              />
 
-            {apiError && <Text c="red" size="sm">{apiError}</Text>}
+              {apiError && <Text c="red" size="sm">{apiError}</Text>}
 
-            <Button type="submit" color="orange" loading={createMutation.isPending}>
-              Создать
-            </Button>
-          </Stack>
-        </form>
-      </Modal>
-    </Stack>
+              <Button
+                type="submit"
+                color="orange"
+                leftSection={<IconCheck size={16} />}
+                loading={createMutation.isPending}
+              >
+                Создать
+              </Button>
+            </Stack>
+          </form>
+        </Modal>
+      </Stack>
+    </Paper>
   );
 }

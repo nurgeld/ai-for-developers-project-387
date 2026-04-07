@@ -1,4 +1,5 @@
-import { Container, Title, Tabs, Stack } from '@mantine/core';
+import { Container, Title, Tabs, Stack, Group, ThemeIcon, Paper } from '@mantine/core';
+import { IconList, IconCalendar, IconSettings } from '@tabler/icons-react';
 import { BookingList } from '../components/admin/BookingList';
 import { OwnerSettingsForm } from '../components/admin/OwnerSettingsForm';
 import { EventTypeManager } from '../components/admin/EventTypeManager';
@@ -7,30 +8,43 @@ import { ScheduleView } from '../components/admin/ScheduleView';
 export function AdminPage() {
   return (
     <Container size="lg" py="xl">
-      <Title order={2} mb="lg">Предстоящие события</Title>
+      <Group gap="xs" mb="xl">
+        <ThemeIcon size="lg" variant="light" color="orange">
+          <IconSettings size={24} />
+        </ThemeIcon>
+        <Title order={2}>Управление</Title>
+      </Group>
 
-      <Tabs defaultValue="bookings">
-        <Tabs.List mb="lg">
-          <Tabs.Tab value="bookings">Бронирования</Tabs.Tab>
-          <Tabs.Tab value="schedule">Расписание</Tabs.Tab>
-          <Tabs.Tab value="settings">Настройки</Tabs.Tab>
-        </Tabs.List>
+      <Paper withBorder radius="md">
+        <Tabs defaultValue="bookings">
+          <Tabs.List p="xs" style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}>
+            <Tabs.Tab value="bookings" leftSection={<IconList size={16} />}>
+              Бронирования
+            </Tabs.Tab>
+            <Tabs.Tab value="schedule" leftSection={<IconCalendar size={16} />}>
+              Расписание
+            </Tabs.Tab>
+            <Tabs.Tab value="settings" leftSection={<IconSettings size={16} />}>
+              Настройки
+            </Tabs.Tab>
+          </Tabs.List>
 
-        <Tabs.Panel value="bookings">
-          <BookingList />
-        </Tabs.Panel>
+          <Tabs.Panel value="bookings" p="lg">
+            <BookingList />
+          </Tabs.Panel>
 
-        <Tabs.Panel value="schedule">
-          <ScheduleView />
-        </Tabs.Panel>
+          <Tabs.Panel value="schedule" p="lg">
+            <ScheduleView />
+          </Tabs.Panel>
 
-        <Tabs.Panel value="settings">
-          <Stack gap="xl">
-            <OwnerSettingsForm />
-            <EventTypeManager />
-          </Stack>
-        </Tabs.Panel>
-      </Tabs>
+          <Tabs.Panel value="settings" p="lg">
+            <Stack gap="xl">
+              <OwnerSettingsForm />
+              <EventTypeManager />
+            </Stack>
+          </Tabs.Panel>
+        </Tabs>
+      </Paper>
     </Container>
   );
 }

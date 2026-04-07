@@ -1,4 +1,5 @@
-import { Container, Stack, Title, Text, SimpleGrid, Loader, Center } from '@mantine/core';
+import { Container, Stack, Title, Text, SimpleGrid, Loader, Center, Group, ThemeIcon } from '@mantine/core';
+import { IconCalendarEvent } from '@tabler/icons-react';
 import { useOwnerSettings } from '../hooks/useOwnerSettings';
 import { useEventTypes } from '../hooks/useEventTypes';
 import { OwnerProfile } from '../components/booking/OwnerProfile';
@@ -9,7 +10,11 @@ export function EventTypesPage() {
   const { data: eventTypes, isLoading: typesLoading } = useEventTypes();
 
   if (settingsLoading || typesLoading) {
-    return <Center py="xl"><Loader /></Center>;
+    return (
+      <Center py="xl">
+        <Loader color="orange" />
+      </Center>
+    );
   }
 
   return (
@@ -17,12 +22,17 @@ export function EventTypesPage() {
       <Stack gap="lg">
         {settings && <OwnerProfile settings={settings} />}
 
-        <div>
-          <Title order={2}>Выберите тип события</Title>
+        <Stack gap="xs">
+          <Group gap="xs">
+            <ThemeIcon size="md" variant="light" color="orange">
+              <IconCalendarEvent size={18} />
+            </ThemeIcon>
+            <Title order={2}>Выберите тип встречи</Title>
+          </Group>
           <Text c="dimmed" size="sm">
-            Нажмите на карточку, чтобы открыть календарь и выбрать удобный слот.
+            Нажмите на карточку, чтобы открыть календарь и выбрать удобный слот
           </Text>
-        </div>
+        </Stack>
 
         <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
           {eventTypes?.map((et) => (

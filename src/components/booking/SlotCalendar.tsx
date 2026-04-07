@@ -33,70 +33,79 @@ export function SlotCalendar({
   const selectedKey = value ? dayjs(value).format('YYYY-MM-DD') : null;
 
   return (
-    <DatePicker
-      value={value ? dayjs(value).format('YYYY-MM-DD') : null}
-      onChange={(val) => {
-        if (!val) {
-          onChange(null);
-          return;
-        }
+    <Box
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        width: '100%',
+      }}
+    >
+      <DatePicker
+        value={value ? dayjs(value).format('YYYY-MM-DD') : null}
+        onChange={(val) => {
+          if (!val) {
+            onChange(null);
+            return;
+          }
 
-        const nextDate = dayjs(val);
-        onChange(nextDate.isBefore(today, 'day') ? null : nextDate.toDate());
-      }}
-      onDateChange={(dateStr) => {
-        onMonthChange(dayjs(dateStr).toDate());
-      }}
-      locale="ru"
-      size="xl"
-      firstDayOfWeek={1}
-      minDate={today.format('YYYY-MM-DD')}
-      excludeDate={(date) => dayjs(date).isBefore(today, 'day')}
-      highlightToday
-      getDayProps={(date) => {
-        const day = dayjs(date);
-        const key = day.format('YYYY-MM-DD');
-        const isPast = day.isBefore(today, 'day');
-        const count = freeCountByDate[key];
-        const hasAvailability = count !== undefined && count > 0 && !isPast;
+          const nextDate = dayjs(val);
+          onChange(nextDate.isBefore(today, 'day') ? null : nextDate.toDate());
+        }}
+        onDateChange={(dateStr) => {
+          onMonthChange(dayjs(dateStr).toDate());
+        }}
+        locale="ru"
+        size="xl"
+        firstDayOfWeek={1}
+        minDate={today.format('YYYY-MM-DD')}
+        excludeDate={(date) => dayjs(date).isBefore(today, 'day')}
+        highlightToday
+        getDayProps={(date) => {
+          const day = dayjs(date);
+          const key = day.format('YYYY-MM-DD');
+          const isPast = day.isBefore(today, 'day');
+          const count = freeCountByDate[key];
+          const hasAvailability = count !== undefined && count > 0 && !isPast;
 
-        return {
-          // Custom data attribute for renderDay to check availability
-          'data-availability': hasAvailability ? 'true' : 'false',
-        };
-      }}
-      renderDay={(date) => {
-        const day = dayjs(date);
-        const key = day.format('YYYY-MM-DD');
-        const count = freeCountByDate[key];
-        const isSelected = selectedKey === key;
-        const isPast = day.isBefore(today, 'day');
-        const hasAvailability = count !== undefined && count > 0 && !isPast;
+          return {
+            'data-availability': hasAvailability ? 'true' : 'false',
+          };
+        }}
+        renderDay={(date) => {
+          const day = dayjs(date);
+          const key = day.format('YYYY-MM-DD');
+          const count = freeCountByDate[key];
+          const isSelected = selectedKey === key;
+          const isPast = day.isBefore(today, 'day');
+          const hasAvailability = count !== undefined && count > 0 && !isPast;
 
-        return (
-          <Box
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <span>{day.date()}</span>
-            {hasAvailability && !isSelected && (
-              <Box
-                style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: '50%',
-                  backgroundColor: 'var(--mantine-color-green-6)',
-                  marginTop: 3,
-                }}
-              />
-            )}
-          </Box>
-        );
-      }}
-    />
+          return (
+            <Box
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '100%',
+                height: '100%',
+              }}
+            >
+              <span>{day.date()}</span>
+              {hasAvailability && !isSelected && (
+                <Box
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: '50%',
+                    backgroundColor: 'var(--mantine-color-orange-5)',
+                    marginTop: 3,
+                  }}
+                />
+              )}
+            </Box>
+          );
+        }}
+      />
+    </Box>
   );
 }

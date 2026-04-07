@@ -11,7 +11,9 @@ import {
   Loader,
   Center,
   ScrollArea,
+  Box,
 } from '@mantine/core';
+import { IconArrowLeft, IconArrowRight, IconAlertCircle } from '@tabler/icons-react';
 import { useNavigate } from '@tanstack/react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { useOwnerSettings } from '../hooks/useOwnerSettings';
@@ -71,12 +73,6 @@ export function BookingPage({ eventTypeId }: BookingPageProps) {
       },
     );
   }, [monthSlots, selectedDate]);
-
-  const freeCount = useMemo(() => {
-    return visibleDaySlots.filter((slot) => !slot.isBooked).length;
-  }, [visibleDaySlots]);
-
-  const totalCount = visibleDaySlots.length;
 
   const calendarSelectedSlot = useMemo(() => {
     if (!selectedSlot) {
@@ -225,7 +221,11 @@ export function BookingPage({ eventTypeId }: BookingPageProps) {
   }, [navigate]);
 
   if (settingsLoading || typesLoading) {
-    return <Center py="xl"><Loader /></Center>;
+    return (
+      <Center py="xl">
+        <Loader color="orange" />
+      </Center>
+    );
   }
 
   if (!eventType) {
@@ -238,78 +238,69 @@ export function BookingPage({ eventTypeId }: BookingPageProps) {
 
   return (
     <Container size="xl" py="xl">
-      <Title order={2} mb="lg">Запись на звонок</Title>
+      <Title order={2} mb="xl">Запись на встречу</Title>
 
-      <Grid gutter="lg" align={step === 'calendar' ? 'stretch' : 'flex-start'}>
-        {/* Left column — summary */}
-        <Grid.Col span={{ base: 12, md: 3 }}>
-          {settings && (
-            <BookingSummary
-              settings={settings}
-              eventType={eventType}
-              selectedDate={selectedDate}
-              selectedSlot={step === 'calendar' ? calendarSelectedSlot : selectedSlot}
-              freeCount={freeCount}
-              totalCount={totalCount}
-            />
-          )}
-        </Grid.Col>
+      {step === 'calendar' ? (
+        // 3-column layout for calendar step with equal height panels
+        <Grid gap="lg">
+          {/* Left column — summary */}
+          <Grid.Col span={{ base: 12, md: 3 }}>
+            {settings && (
+              <BookingSummary
+                settings={settings}
+                eventType={eventType}
+                selectedDate={selectedDate}
+                selectedSlot={calendarSelectedSlot}
+              />
+            )}
+          </Grid.Col>
 
-        {/* Center column — calendar (only in calendar step) */}
-        {step === 'calendar' && (
+          {/* Center column — calendar */}
           <Grid.Col span={{ base: 12, md: 5 }}>
-            <Paper withBorder shadow="sm" p="lg" radius="md">
-              <Stack gap="md">
-                <Title order={4}>Календарь</Title>
-                <SlotCalendar
-                  value={selectedDate}
-                  onChange={(date) => {
-                    setSelectedDate(date);
-                    setSelectedSlot(null);
-                    setBookingError(null);
-                  }}
-                  monthSlots={monthSlots ?? []}
-                  onMonthChange={setCurrentMonth}
-                />
+            <Paper withBorder p="lg" radius="md" miw={350} mih={600}>
+              <Stack gap="md" h="100%" justify="space-between">
+                <Title order={4}>Выбрать дату</Title>
+                <Box style={{ display: 'flex', justifyContent: 'center', flex: 1 }}>
+                  <SlotCalendar
+                    value={selectedDate}
+                    onChange={(date) => {
+                      setSelectedDate(date);
+                      setSelectedSlot(null);
+                      setBookingError(null);
+                    }}
+                    monthSlots={monthSlots ?? []}
+                    onMonthChange={setCurrentMonth}
+                  />
+                </Box>
               </Stack>
             </Paper>
           </Grid.Col>
-        )}
 
-        {/* Right column — dynamic content */}
-        <Grid.Col
-          span={{ base: 12, md: step === 'calendar' ? 4 : 9 }}
-          style={{
-            minHeight: 0,
-            maxHeight: '75vh',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-          }}
-        >
-          {step === 'calendar' && (
+          {/* Right column — slots with scroll and fixed buttons */}
+          <Grid.Col span={{ base: 12, md: 4 }}>
             <Paper
               withBorder
-              shadow="sm"
               p="lg"
               radius="md"
+              mih={600}
+              mah="calc(100vh - 180px)"
               style={{
                 display: 'flex',
                 flexDirection: 'column',
-                minHeight: 0,
-                flex: 1,
-                overflow: 'hidden',
               }}
             >
-              <Stack gap="md" style={{ minHeight: 0, flex: 1 }}>
-                <Title order={4}>Статус слотов</Title>
+              <Stack gap="md" style={{ flex: 1, minHeight: 0 }}>
+                <Title order={4}>Выбрать время</Title>
                 {bookingError && (
-                  <Text c="red" size="sm">
-                    {bookingError}
-                  </Text>
+                  <Group gap="xs">
+                    <IconAlertCircle size={16} color="var(--mantine-color-red-5)" />
+                    <Text c="red" size="sm">
+                      {bookingError}
+                    </Text>
+                  </Group>
                 )}
                 <ScrollArea
-                  style={{ flex: 1, minHeight: 0 }}
+                  style={{ flex: 1 }}
                   offsetScrollbars
                   scrollbarSize={6}
                 >
@@ -322,11 +313,12 @@ export function BookingPage({ eventTypeId }: BookingPageProps) {
                 <Group
                   justify="space-between"
                   pt="md"
-                  style={{ flexShrink: 0 }}
+                  style={{ borderTop: '1px solid var(--mantine-color-gray-3)', flexShrink: 0 }}
                 >
                   <Button
-                    variant="outline"
+                    variant="subtle"
                     color="gray"
+                    leftSection={<IconArrowLeft size={16} />}
                     onClick={() => navigate({ to: '/book' })}
                   >
                     Назад
@@ -334,6 +326,7 @@ export function BookingPage({ eventTypeId }: BookingPageProps) {
                   <Button
                     color="orange"
                     disabled={!calendarSelectedSlot}
+                    rightSection={<IconArrowRight size={16} />}
                     onClick={handleContinue}
                   >
                     Продолжить
@@ -341,26 +334,42 @@ export function BookingPage({ eventTypeId }: BookingPageProps) {
                 </Group>
               </Stack>
             </Paper>
-          )}
+          </Grid.Col>
+        </Grid>
+      ) : (
+        // 2-column layout for form and success steps
+        <Grid gap="lg">
+          {/* Left column — summary */}
+          <Grid.Col span={{ base: 12, md: 3 }}>
+            {settings && (
+              <BookingSummary
+                settings={settings}
+                eventType={eventType}
+                selectedDate={selectedDate}
+                selectedSlot={selectedSlot}
+              />
+            )}
+          </Grid.Col>
 
-          {step === 'form' && (
-            <ScrollArea style={{ maxHeight: '75vh' }}>
+          {/* Right columns — dynamic content */}
+          <Grid.Col span={{ base: 12, md: 9 }}>
+            {step === 'form' && selectedDate && selectedSlot && (
               <BookingForm
                 onSubmit={handleSubmit}
                 onBack={handleBack}
                 isLoading={createBooking.isPending}
                 error={bookingError}
+                selectedDate={selectedDate}
+                selectedSlot={selectedSlot}
               />
-            </ScrollArea>
-          )}
+            )}
 
-          {step === 'success' && (
-            <ScrollArea style={{ maxHeight: '75vh' }}>
+            {step === 'success' && (
               <BookingSuccess onBookAnother={handleBookAnother} />
-            </ScrollArea>
-          )}
-        </Grid.Col>
-      </Grid>
+            )}
+          </Grid.Col>
+        </Grid>
+      )}
     </Container>
   );
 }

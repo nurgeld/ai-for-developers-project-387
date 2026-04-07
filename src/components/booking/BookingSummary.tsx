@@ -1,4 +1,5 @@
-import { Stack, Text, Card, Divider } from '@mantine/core';
+import { Stack, Text, Paper, Divider, Group, ThemeIcon, Box } from '@mantine/core';
+import { IconUser, IconCalendar, IconClock, IconHourglass } from '@tabler/icons-react';
 import type { EventType, Slot } from '../../api/types';
 import { OwnerProfile } from './OwnerProfile';
 import type { OwnerSettings } from '../../api/types';
@@ -9,8 +10,6 @@ interface BookingSummaryProps {
   eventType: EventType;
   selectedDate: Date | null;
   selectedSlot: Slot | null;
-  freeCount: number;
-  totalCount: number;
 }
 
 export function BookingSummary({
@@ -18,53 +17,69 @@ export function BookingSummary({
   eventType,
   selectedDate,
   selectedSlot,
-  freeCount,
-  totalCount,
 }: BookingSummaryProps) {
   return (
-    <Card withBorder shadow="sm" radius="md">
+    <Paper withBorder p="lg" radius="md" mih={600}>
       <Stack gap="md">
         <OwnerProfile settings={settings} />
 
         <Divider />
 
-        <div>
-          <Text fw={600} size="lg">{eventType.name}</Text>
-          <Text size="sm" c="dimmed">{eventType.description}</Text>
-        </div>
+        <Group gap="xs" align="flex-start">
+          <ThemeIcon size="sm" variant="light" color="orange" style={{ marginTop: 2 }}>
+            <IconUser size={14} />
+          </ThemeIcon>
+          <Box style={{ flex: 1 }}>
+            <Text size="xs" c="dimmed">Тип встречи</Text>
+            <Text fw={500} size="sm">{eventType.name}</Text>
+            {eventType.description && (
+              <Text size="xs" c="dimmed" lineClamp={2} mt={2}>
+                {eventType.description}
+              </Text>
+            )}
+          </Box>
+        </Group>
 
-        <Card withBorder p="sm" radius="sm" bg="gray.0">
-          <Text size="xs" c="dimmed">Выбранная дата</Text>
-          <Text fw={500}>
-            {selectedDate
-              ? dayjs(selectedDate).format('dddd, D MMMM')
-              : 'Дата не выбрана'}
-          </Text>
-        </Card>
+        <Group gap="xs">
+          <ThemeIcon size="sm" variant="light" color="orange">
+            <IconHourglass size={14} />
+          </ThemeIcon>
+          <div>
+            <Text size="xs" c="dimmed">Длительность</Text>
+            <Text fw={500} size="sm">{eventType.durationMinutes} мин</Text>
+          </div>
+        </Group>
 
-        <Card withBorder p="sm" radius="sm" bg="gray.0">
-          <Text size="xs" c="dimmed">Выбранное время</Text>
-          <Text fw={500}>
-            {selectedSlot
-              ? `${dayjs.utc(selectedSlot.startAt).format('HH:mm')} - ${dayjs.utc(selectedSlot.endAt).format('HH:mm')}`
-              : 'Время не выбрано'}
-          </Text>
-        </Card>
+        <Divider />
 
-        <Card withBorder p="sm" radius="sm" bg="gray.0">
-          <Text size="xs" c="dimmed">Свободно</Text>
-          <Text fw={500}>{freeCount}</Text>
-        </Card>
+        <Group gap="xs">
+          <ThemeIcon size="sm" variant="light" color={selectedDate ? 'orange' : 'gray'}>
+            <IconCalendar size={14} />
+          </ThemeIcon>
+          <div>
+            <Text size="xs" c="dimmed">Дата</Text>
+            <Text fw={500} size="sm">
+              {selectedDate
+                ? dayjs(selectedDate).format('D MMMM')
+                : 'Не выбрана'}
+            </Text>
+          </div>
+        </Group>
 
-        <Card withBorder p="sm" radius="sm" bg="gray.0">
-          <Text size="xs" c="dimmed">Длительность</Text>
-          <Text fw={500}>
-            {totalCount > 0
-              ? `${eventType.durationMinutes} мин`
-              : 'Нет слотов на этот день'}
-          </Text>
-        </Card>
+        <Group gap="xs">
+          <ThemeIcon size="sm" variant="light" color={selectedSlot ? 'orange' : 'gray'}>
+            <IconClock size={14} />
+          </ThemeIcon>
+          <div>
+            <Text size="xs" c="dimmed">Время</Text>
+            <Text fw={500} size="sm">
+              {selectedSlot
+                ? `${dayjs.utc(selectedSlot.startAt).format('HH:mm')} - ${dayjs.utc(selectedSlot.endAt).format('HH:mm')}`
+                : 'Не выбрано'}
+            </Text>
+          </div>
+        </Group>
       </Stack>
-    </Card>
+    </Paper>
   );
 }
