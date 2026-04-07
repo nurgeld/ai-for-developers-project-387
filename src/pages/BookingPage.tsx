@@ -283,7 +283,7 @@ export function BookingPage({ eventTypeId }: BookingPageProps) {
               p="lg"
               radius="md"
               mih={600}
-              mah="calc(100vh - 180px)"
+              mah="calc(75vh - 80px)"
               style={{
                 display: 'flex',
                 flexDirection: 'column',

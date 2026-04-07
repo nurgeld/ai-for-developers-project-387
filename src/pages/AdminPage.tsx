@@ -16,8 +16,27 @@ export function AdminPage() {
       </Group>
 
       <Paper withBorder radius="md">
-        <Tabs defaultValue="bookings">
-          <Tabs.List p="xs" style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}>
+        <Tabs 
+          defaultValue="bookings" 
+          variant="outline"
+          styles={{
+            list: {
+              borderBottom: 'none',
+            },
+            tab: {
+              borderTop: '3px solid transparent',
+              borderBottom: 'none',
+              borderLeft: 'none',
+              borderRight: 'none',
+              '&[data-active]': {
+                borderTopColor: 'var(--mantine-color-orange-5)',
+                borderBottom: 'none',
+                backgroundColor: 'var(--mantine-color-orange-0)',
+              },
+            },
+          }}
+        >
+          <Tabs.List p="xs">
             <Tabs.Tab value="bookings" leftSection={<IconList size={16} />}>
               Бронирования
             </Tabs.Tab>
