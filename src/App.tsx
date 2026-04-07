@@ -20,6 +20,7 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <MantineProvider
         theme={{
+          primaryColor: 'orange',
           defaultRadius: 'md',
           components: {
             Paper: {
