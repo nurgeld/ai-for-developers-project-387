@@ -14,7 +14,21 @@ import { AdminPage } from './pages/AdminPage';
 // Root layout
 const rootRoute = createRootRoute({
   component: () => (
-    <AppShell header={{ height: 60 }} padding="md">
+    <AppShell
+      header={{ height: 60 }}
+      padding="md"
+      styles={{
+        root: {
+          minHeight: '100vh',
+          background: 'linear-gradient(180deg, #d4edda 0%, #f0f9f0 45%, #ffffff 100%)',
+        },
+        header: {
+          backgroundColor: '#ffffff',
+          borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
+        },
+        main: { backgroundColor: 'transparent' },
+      }}
+    >
       <AppShell.Header>
         <Header />
       </AppShell.Header>

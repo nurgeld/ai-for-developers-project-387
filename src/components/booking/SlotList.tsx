@@ -42,8 +42,8 @@ export function SlotList({ slots, selectedSlot, onSelect }: SlotListProps) {
             }}
           >
             <Group justify="space-between" w="100%">
-              <Text size="sm">{start} - {end}</Text>
-              <Text size="sm" fw={600}>
+              <Text size="sm" c="dark">{start} - {end}</Text>
+              <Text size="sm" fw={600} c="dark">
                 {slot.isBooked ? 'Занято' : 'Свободно'}
               </Text>
             </Group>
