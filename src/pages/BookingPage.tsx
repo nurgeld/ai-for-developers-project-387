@@ -240,7 +240,7 @@ export function BookingPage({ eventTypeId }: BookingPageProps) {
     <Container size="xl" py="xl">
       <Title order={2} mb="lg">Запись на звонок</Title>
 
-      <Grid gap="lg" style={{ alignItems: step === 'calendar' ? 'stretch' : 'flex-start' }}>
+      <Grid gutter="lg" align={step === 'calendar' ? 'stretch' : 'flex-start'}>
         {/* Left column — summary */}
         <Grid.Col span={{ base: 12, md: 3 }}>
           {settings && (
@@ -258,8 +258,8 @@ export function BookingPage({ eventTypeId }: BookingPageProps) {
         {/* Center column — calendar (only in calendar step) */}
         {step === 'calendar' && (
           <Grid.Col span={{ base: 12, md: 5 }}>
-            <Paper withBorder p="lg" radius="md" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-              <Stack gap="md" style={{ flex: 1 }}>
+            <Paper withBorder shadow="sm" p="lg" radius="md">
+              <Stack gap="md">
                 <Title order={4}>Календарь</Title>
                 <SlotCalendar
                   value={selectedDate}
@@ -290,6 +290,7 @@ export function BookingPage({ eventTypeId }: BookingPageProps) {
           {step === 'calendar' && (
             <Paper
               withBorder
+              shadow="sm"
               p="lg"
               radius="md"
               style={{

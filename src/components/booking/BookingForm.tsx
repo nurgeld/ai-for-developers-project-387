@@ -24,7 +24,7 @@ export function BookingForm({ onSubmit, onBack, isLoading, error }: BookingFormP
   });
 
   return (
-    <Paper withBorder p="lg" radius="md">
+    <Paper withBorder shadow="sm" p="lg" radius="md">
       <Stack gap="md">
         <Text fw={600} size="lg">Подтверждение записи</Text>
 

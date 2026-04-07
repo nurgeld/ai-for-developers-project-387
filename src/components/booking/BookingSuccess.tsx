@@ -6,7 +6,7 @@ interface BookingSuccessProps {
 
 export function BookingSuccess({ onBookAnother }: BookingSuccessProps) {
   return (
-    <Paper withBorder p="xl" radius="md">
+    <Paper withBorder shadow="sm" p="xl" radius="md">
       <Stack gap="lg" align="center">
         <Text fw={700} size="xl" ta="center">
           Бронь подтверждена. До встречи!

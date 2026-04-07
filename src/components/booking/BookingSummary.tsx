@@ -1,4 +1,4 @@
-import { Stack, Text, Paper } from '@mantine/core';
+import { Stack, Text, Card, Divider } from '@mantine/core';
 import type { EventType, Slot } from '../../api/types';
 import { OwnerProfile } from './OwnerProfile';
 import type { OwnerSettings } from '../../api/types';
@@ -22,47 +22,49 @@ export function BookingSummary({
   totalCount,
 }: BookingSummaryProps) {
   return (
-    <Paper withBorder p="lg" radius="md" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-      <Stack gap="md" style={{ flex: 1 }}>
+    <Card withBorder shadow="sm" radius="md">
+      <Stack gap="md">
         <OwnerProfile settings={settings} />
+
+        <Divider />
 
         <div>
           <Text fw={600} size="lg">{eventType.name}</Text>
           <Text size="sm" c="dimmed">{eventType.description}</Text>
         </div>
 
-        <Paper bg="orange.0" p="sm" radius="sm">
+        <Card withBorder p="sm" radius="sm" bg="gray.0">
           <Text size="xs" c="dimmed">Выбранная дата</Text>
           <Text fw={500}>
             {selectedDate
               ? dayjs(selectedDate).format('dddd, D MMMM')
               : 'Дата не выбрана'}
           </Text>
-        </Paper>
+        </Card>
 
-        <Paper bg="orange.0" p="sm" radius="sm">
+        <Card withBorder p="sm" radius="sm" bg="gray.0">
           <Text size="xs" c="dimmed">Выбранное время</Text>
           <Text fw={500}>
             {selectedSlot
               ? `${dayjs.utc(selectedSlot.startAt).format('HH:mm')} - ${dayjs.utc(selectedSlot.endAt).format('HH:mm')}`
               : 'Время не выбрано'}
           </Text>
-        </Paper>
+        </Card>
 
-        <Paper bg="orange.0" p="sm" radius="sm">
+        <Card withBorder p="sm" radius="sm" bg="gray.0">
           <Text size="xs" c="dimmed">Свободно</Text>
           <Text fw={500}>{freeCount}</Text>
-        </Paper>
+        </Card>
 
-        <Paper bg="orange.0" p="sm" radius="sm">
-          <Text size="xs" c="dimmed">Длительности в дне</Text>
+        <Card withBorder p="sm" radius="sm" bg="gray.0">
+          <Text size="xs" c="dimmed">Длительность</Text>
           <Text fw={500}>
             {totalCount > 0
               ? `${eventType.durationMinutes} мин`
               : 'Нет слотов на этот день'}
           </Text>
-        </Paper>
+        </Card>
       </Stack>
-    </Paper>
+    </Card>
   );
 }

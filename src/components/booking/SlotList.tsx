@@ -11,8 +11,8 @@ interface SlotListProps {
 export function SlotList({ slots, selectedSlot, onSelect }: SlotListProps) {
   if (slots.length === 0) {
     return (
-      <Paper withBorder p="lg" radius="md">
-        <Text c="dimmed" ta="center">Выберите дату в календаре.</Text>
+      <Paper withBorder shadow="sm" p="lg" radius="md">
+        <Text c="dimmed" ta="center">Выберите дату в календаре</Text>
       </Paper>
     );
   }
@@ -25,25 +25,30 @@ export function SlotList({ slots, selectedSlot, onSelect }: SlotListProps) {
         const isSelected =
           selectedSlot?.startAt === slot.startAt;
 
+        // Вариант А: filled (выбранный), light (свободный), outline disabled (занят)
+        const variant = isSelected
+          ? 'filled'
+          : slot.isBooked
+            ? 'outline'
+            : 'light';
+
+        const color = isSelected
+          ? 'orange'
+          : 'gray';
+
         return (
           <Button
             key={slot.startAt}
-            variant={isSelected ? 'filled' : 'outline'}
-            color={slot.isBooked ? 'gray' : isSelected ? 'orange' : 'gray'}
+            variant={variant}
+            color={color}
             disabled={slot.isBooked}
             onClick={() => onSelect(slot)}
             fullWidth
             justify="space-between"
-            h="auto"
-            py="sm"
-            styles={{
-              inner: { justifyContent: 'space-between', width: '100%' },
-              label: { width: '100%' },
-            }}
           >
             <Group justify="space-between" w="100%">
-              <Text size="sm" c="dark">{start} - {end}</Text>
-              <Text size="sm" fw={600} c="dark">
+              <Text size="sm">{start} - {end}</Text>
+              <Text size="sm" fw={600}>
                 {slot.isBooked ? 'Занято' : 'Свободно'}
               </Text>
             </Group>
