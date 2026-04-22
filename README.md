@@ -1,6 +1,7 @@
-# Booking System
+### Hexlet tests and linter status:
+[![Actions Status](https://github.com/nurgeld/ai-for-developers-project-387/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/nurgeld/ai-for-developers-project-387/actions)
 
-[![Hexlet Check](https://github.com/nurgeld/ai-for-developers-project-386/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/nurgeld/ai-for-developers-project-386/actions)
+# Booking System
 
 A calendar-based booking application for event scheduling. The system supports two roles: calendar owner and guests.
 
