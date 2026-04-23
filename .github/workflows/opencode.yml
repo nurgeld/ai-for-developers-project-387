@@ -31,3 +31,16 @@ jobs:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
         with:
           model: opencode/gpt-5.3-codex
+          prompt: |
+            Work only with the repository contents and the GitHub issue/PR context.
+
+            Do not use localhost-dependent tools or scripts.
+            Do not start local services.
+            Do not use:
+            - .opencode/tools/run-seed.js
+            - seed-test-data
+            - .opencode/tools/run-render-check.js
+            - Render deployment checks
+            unless the user explicitly asks for deployment verification.
+
+            For issue and PR comments, focus on explanation, analysis, and repository-contained code changes only.

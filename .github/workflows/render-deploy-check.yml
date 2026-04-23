@@ -1,0 +1,48 @@
+name: render-deploy-check
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: render-deploy-check-main
+  cancel-in-progress: true
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    env:
+      RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+      RENDER_SERVICE_NAME: ${{ vars.RENDER_SERVICE_NAME }}
+      RENDER_BASE_URL: ${{ vars.RENDER_BASE_URL }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Wait for Render deploy
+        run: |
+          node .opencode/tools/run-render-check.js --wait --timeout 300
+
+      - name: Smoke check root
+        run: |
+          curl --fail --silent --show-error "$RENDER_BASE_URL/" > /dev/null
+
+      - name: Smoke check settings API
+        run: |
+          curl --fail --silent --show-error "$RENDER_BASE_URL/api/settings" > /dev/null
+
+      - name: Smoke check event types API
+        run: |
+          curl --fail --silent --show-error "$RENDER_BASE_URL/api/event-types" > /dev/null
