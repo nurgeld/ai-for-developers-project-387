@@ -60,7 +60,10 @@ Required environment variables for owner/admin access:
 
 ```bash
 export OWNER_API_TOKEN=replace_with_strong_random_token
+export VITE_OWNER_API_TOKEN=$OWNER_API_TOKEN
 ```
+
+`VITE_OWNER_API_TOKEN` must match `OWNER_API_TOKEN` so browser owner requests can send bearer auth.
 
 Optional CORS allowlist (comma-separated):
 

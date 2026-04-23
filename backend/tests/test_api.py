@@ -1,5 +1,7 @@
 from datetime import datetime
 
+import pytest
+
 from app.models import Booking
 from app.time_utils import UTC
 
@@ -168,6 +170,26 @@ def test_owner_bookings_reject_inverted_date_range(client, owner_auth_headers):
 
 def test_owner_endpoints_require_bearer_token(client):
     response = client.get("/api/owner/bookings")
+
+    assert response.status_code == 401
+    assert response.json()["error"] == "UNAUTHORIZED"
+
+
+@pytest.mark.parametrize(
+    "authorization",
+    [
+        "Bearer",
+        "Bearer ",
+        "Bearer    token",
+        "Bearer\twrong-token",
+        "Token wrong-token",
+    ],
+)
+def test_owner_endpoints_reject_invalid_bearer_format(client, authorization):
+    response = client.get(
+        "/api/owner/bookings",
+        headers={"Authorization": authorization},
+    )
 
     assert response.status_code == 401
     assert response.json()["error"] == "UNAUTHORIZED"

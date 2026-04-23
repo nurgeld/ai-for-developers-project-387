@@ -46,15 +46,15 @@ ifndef RENDER_API_KEY
 endif
 	@node scripts/run-render-check.js --format json
 _start-backend:
-	cd backend && nohup poetry run python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 > /tmp/backend.log 2>&1 &
+	cd backend && OWNER_API_TOKEN=$${OWNER_API_TOKEN:-dev-owner-token} nohup poetry run python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 > /tmp/backend.log 2>&1 &
 _start-mock-api:
 	nohup npx prism mock src/api/openapi.json -p 4010 > /tmp/prism.log 2>&1 &
 	@echo "Prism mock API started"
 _start-vite-mock:
-	nohup npx vite --mode mock --host > /tmp/vite.log 2>&1 &
+	VITE_OWNER_API_TOKEN=$${VITE_OWNER_API_TOKEN:-$${OWNER_API_TOKEN:-dev-owner-token}} nohup npx vite --mode mock --host > /tmp/vite.log 2>&1 &
 	@echo "Vite dev server started"
 _start-vite-real:
-	nohup npx vite --host > /tmp/vite.log 2>&1 &
+	VITE_OWNER_API_TOKEN=$${VITE_OWNER_API_TOKEN:-$${OWNER_API_TOKEN:-dev-owner-token}} nohup npx vite --host > /tmp/vite.log 2>&1 &
 	@echo "Vite dev server started"
 dev:
 	npm run dev

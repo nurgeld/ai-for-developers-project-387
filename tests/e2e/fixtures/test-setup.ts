@@ -56,6 +56,7 @@ interface RequestOptions {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
   params?: Record<string, string | undefined>;
   data?: unknown;
+  ownerAuth?: boolean;
 }
 
 export interface SlotLookupResult {
@@ -102,6 +103,8 @@ const DEFAULT_EVENT_TYPES: Array<Omit<EventType, 'id'>> = [
     durationMinutes: 30,
   },
 ];
+
+const OWNER_API_TOKEN = process.env.OWNER_API_TOKEN ?? process.env.VITE_OWNER_API_TOKEN ?? 'dev-owner-token';
 
 class TestApiError extends Error {
   status: number;
@@ -164,6 +167,7 @@ async function apiRequest<T>(
     headers: {
       Accept: 'application/json',
       ...(options?.data !== undefined ? { 'Content-Type': 'application/json' } : {}),
+      ...(options?.ownerAuth ? { Authorization: `Bearer ${OWNER_API_TOKEN}` } : {}),
     },
     data: options?.data,
     failOnStatusCode: false,
@@ -196,6 +200,7 @@ function createApiHelpers(request: APIRequestContext, apiBaseUrl: string): TestA
     async updateSettingsViaAPI(data) {
       return apiRequest<OwnerSettings>(request, apiBaseUrl, '/owner/settings', {
         method: 'PATCH',
+        ownerAuth: true,
         data: {
           ...data,
           avatarUrl: data.avatarUrl ?? '',
@@ -210,6 +215,7 @@ function createApiHelpers(request: APIRequestContext, apiBaseUrl: string): TestA
     async createEventTypeViaAPI(data) {
       return apiRequest<EventType>(request, apiBaseUrl, '/owner/event-types', {
         method: 'POST',
+        ownerAuth: true,
         data,
       });
     },
@@ -217,6 +223,7 @@ function createApiHelpers(request: APIRequestContext, apiBaseUrl: string): TestA
     async updateEventTypeViaAPI(id, data) {
       return apiRequest<EventType>(request, apiBaseUrl, `/owner/event-types/${id}`, {
         method: 'PATCH',
+        ownerAuth: true,
         data,
       });
     },
@@ -224,6 +231,7 @@ function createApiHelpers(request: APIRequestContext, apiBaseUrl: string): TestA
     async deleteEventTypeViaAPI(id) {
       await apiRequest<void>(request, apiBaseUrl, `/owner/event-types/${id}`, {
         method: 'DELETE',
+        ownerAuth: true,
       });
     },
 
@@ -242,7 +250,9 @@ function createApiHelpers(request: APIRequestContext, apiBaseUrl: string): TestA
     },
 
     async getBookings() {
-      return apiRequest<Booking[]>(request, apiBaseUrl, '/owner/bookings');
+      return apiRequest<Booking[]>(request, apiBaseUrl, '/owner/bookings', {
+        ownerAuth: true,
+      });
     },
 
     async createBookingViaAPI(data) {
@@ -255,6 +265,7 @@ function createApiHelpers(request: APIRequestContext, apiBaseUrl: string): TestA
     async cancelBookingViaAPI(id) {
       await apiRequest<void>(request, apiBaseUrl, `/owner/bookings/${id}`, {
         method: 'DELETE',
+        ownerAuth: true,
       });
     },
 

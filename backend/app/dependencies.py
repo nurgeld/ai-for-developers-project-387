@@ -20,7 +20,11 @@ def require_owner_auth(authorization: str | None = Header(default=None)) -> None
     if authorization is None:
         raise unauthorized_error()
 
-    scheme, _, token = authorization.partition(" ")
+    parts = authorization.split(" ")
+    if len(parts) != 2:
+        raise unauthorized_error()
+
+    scheme, token = parts
     if scheme.lower() != "bearer" or not token:
         raise unauthorized_error()
 
