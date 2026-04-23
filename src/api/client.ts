@@ -10,6 +10,7 @@ import type {
 } from './types';
 
 const BASE = '/api';
+const OWNER_API_TOKEN = import.meta.env.VITE_OWNER_API_TOKEN?.trim();
 
 export class ApiError extends Error {
   status: number;
@@ -29,9 +30,10 @@ async function request<T>(
     method?: string;
     params?: Record<string, string | undefined>;
     body?: unknown;
+    headers?: Record<string, string>;
   },
 ): Promise<T> {
-  const { method = 'GET', params, body } = options ?? {};
+  const { method = 'GET', params, body, headers } = options ?? {};
 
   let url = `${BASE}${path}`;
 
@@ -51,6 +53,7 @@ async function request<T>(
     headers: {
       Accept: 'application/json',
       ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
+      ...(headers ?? {}),
     },
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });
@@ -121,24 +124,39 @@ export function createBooking(body: CreateBookingRequest): Promise<Booking> {
 export function updateSettings(
   body: UpdateOwnerSettingsRequest,
 ): Promise<OwnerSettings> {
-  return request('/owner/settings', { method: 'PATCH', body });
+  return request('/owner/settings', {
+    method: 'PATCH',
+    body,
+    headers: getOwnerAuthHeaders(),
+  });
 }
 
 export function createEventType(
   body: CreateEventTypeRequest,
 ): Promise<EventType> {
-  return request('/owner/event-types', { method: 'POST', body });
+  return request('/owner/event-types', {
+    method: 'POST',
+    body,
+    headers: getOwnerAuthHeaders(),
+  });
 }
 
 export function updateEventType(
   id: string,
   body: UpdateEventTypeRequest,
 ): Promise<EventType> {
-  return request(`/owner/event-types/${id}`, { method: 'PATCH', body });
+  return request(`/owner/event-types/${id}`, {
+    method: 'PATCH',
+    body,
+    headers: getOwnerAuthHeaders(),
+  });
 }
 
 export function deleteEventType(id: string): Promise<void> {
-  return request(`/owner/event-types/${id}`, { method: 'DELETE' });
+  return request(`/owner/event-types/${id}`, {
+    method: 'DELETE',
+    headers: getOwnerAuthHeaders(),
+  });
 }
 
 export interface ListBookingsParams {
@@ -156,9 +174,23 @@ export function listBookings(params?: ListBookingsParams): Promise<Booking[]> {
           endDate: params.endDate,
         }
       : undefined,
+    headers: getOwnerAuthHeaders(),
   });
 }
 
 export function cancelBooking(id: string): Promise<void> {
-  return request(`/owner/bookings/${id}`, { method: 'DELETE' });
+  return request(`/owner/bookings/${id}`, {
+    method: 'DELETE',
+    headers: getOwnerAuthHeaders(),
+  });
+}
+
+function getOwnerAuthHeaders(): Record<string, string> {
+  if (!OWNER_API_TOKEN) {
+    return {};
+  }
+
+  return {
+    Authorization: `Bearer ${OWNER_API_TOKEN}`,
+  };
 }

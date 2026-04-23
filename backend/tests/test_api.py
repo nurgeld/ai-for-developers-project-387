@@ -1,5 +1,7 @@
 from datetime import datetime
 
+import pytest
+
 from app.models import Booking
 from app.time_utils import UTC
 
@@ -47,7 +49,7 @@ def test_list_slots_rejects_inverted_date_range(client):
     assert response.json()["error"] == "VALIDATION_ERROR"
 
 
-def test_owner_bookings_end_date_filter_is_inclusive(client, storage):
+def test_owner_bookings_end_date_filter_is_inclusive(client, storage, owner_auth_headers):
     storage.save_booking(
         Booking(
             id="booking-1",
@@ -85,38 +87,44 @@ def test_owner_bookings_end_date_filter_is_inclusive(client, storage):
         )
     )
 
-    response = client.get("/api/owner/bookings", params={"endDate": "2035-01-10"})
+    response = client.get(
+        "/api/owner/bookings",
+        params={"endDate": "2035-01-10"},
+        headers=owner_auth_headers,
+    )
 
     assert response.status_code == 200
     assert [booking["id"] for booking in response.json()] == ["booking-1", "booking-2"]
 
 
-def test_update_owner_settings_returns_contract_validation_error(client):
+def test_update_owner_settings_returns_contract_validation_error(client, owner_auth_headers):
     response = client.patch(
         "/api/owner/settings",
         json={
             "workDayStart": "18:00",
             "workDayEnd": "09:00",
         },
+        headers=owner_auth_headers,
     )
 
     assert response.status_code == 400
     assert response.json()["error"] == "VALIDATION_ERROR"
 
 
-def test_update_owner_settings_rejects_blank_name(client):
+def test_update_owner_settings_rejects_blank_name(client, owner_auth_headers):
     response = client.patch(
         "/api/owner/settings",
         json={
             "name": "   ",
         },
+        headers=owner_auth_headers,
     )
 
     assert response.status_code == 400
     assert response.json()["error"] == "VALIDATION_ERROR"
 
 
-def test_create_event_type_rejects_duplicate_duration(client):
+def test_create_event_type_rejects_duplicate_duration(client, owner_auth_headers):
     response = client.post(
         "/api/owner/event-types",
         json={
@@ -124,6 +132,7 @@ def test_create_event_type_rejects_duplicate_duration(client):
             "description": "Duplicate duration",
             "durationMinutes": 15,
         },
+        headers=owner_auth_headers,
     )
 
     assert response.status_code == 409
@@ -145,14 +154,89 @@ def test_create_booking_rejects_invalid_email(client):
     assert response.json()["error"] == "VALIDATION_ERROR"
 
 
-def test_owner_bookings_reject_inverted_date_range(client):
+def test_owner_bookings_reject_inverted_date_range(client, owner_auth_headers):
     response = client.get(
         "/api/owner/bookings",
         params={
             "startDate": "2035-01-11",
             "endDate": "2035-01-10",
         },
+        headers=owner_auth_headers,
     )
 
     assert response.status_code == 400
     assert response.json()["error"] == "VALIDATION_ERROR"
+
+
+def test_owner_endpoints_require_bearer_token(client):
+    response = client.get("/api/owner/bookings")
+
+    assert response.status_code == 401
+    assert response.json()["error"] == "UNAUTHORIZED"
+
+
+@pytest.mark.parametrize(
+    "authorization",
+    [
+        "Bearer",
+        "Bearer ",
+        "Bearer    token",
+        "Bearer\twrong-token",
+        "Token wrong-token",
+    ],
+)
+def test_owner_endpoints_reject_invalid_bearer_format(client, authorization):
+    response = client.get(
+        "/api/owner/bookings",
+        headers={"Authorization": authorization},
+    )
+
+    assert response.status_code == 401
+    assert response.json()["error"] == "UNAUTHORIZED"
+
+
+def test_owner_endpoints_reject_invalid_bearer_token(client):
+    response = client.get(
+        "/api/owner/bookings",
+        headers={"Authorization": "Bearer wrong-token"},
+    )
+
+    assert response.status_code == 403
+    assert response.json()["error"] == "FORBIDDEN"
+
+
+def test_cors_allows_only_configured_origins(client):
+    response = client.options(
+        "/api/owner/bookings",
+        headers={
+            "Origin": "http://localhost:5173",
+            "Access-Control-Request-Method": "GET",
+            "Access-Control-Request-Headers": "authorization",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.headers.get("access-control-allow-origin") == "http://localhost:5173"
+
+
+def test_cors_blocks_not_allowed_origins(client):
+    response = client.options(
+        "/api/owner/bookings",
+        headers={
+            "Origin": "https://evil.example",
+            "Access-Control-Request-Method": "GET",
+            "Access-Control-Request-Headers": "authorization",
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.headers.get("access-control-allow-origin") is None
+
+
+def test_security_headers_are_present(client):
+    response = client.get("/api/settings")
+
+    assert response.status_code == 200
+    assert response.headers["x-content-type-options"] == "nosniff"
+    assert response.headers["x-frame-options"] == "DENY"
+    assert response.headers["referrer-policy"] == "no-referrer"

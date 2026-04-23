@@ -1,6 +1,7 @@
+import os
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -12,6 +13,14 @@ from app.routers import settings, event_types, slots, bookings, owner_settings
 
 
 DIST_DIR = Path(__file__).resolve().parents[2] / "dist"
+
+
+def parse_allowed_origins() -> list[str]:
+    raw_origins = os.getenv(
+        "ALLOWED_ORIGINS",
+        "http://localhost:5173,http://127.0.0.1:5173",
+    )
+    return [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
 
 
 def configure_spa(app: FastAPI) -> None:
@@ -46,6 +55,7 @@ def configure_spa(app: FastAPI) -> None:
 def create_app(storage: Storage | None = None) -> FastAPI:
     app = FastAPI(title="Calendar Booking API")
     app.state.storage = storage or Storage()
+    allowed_origins = parse_allowed_origins()
 
     app.add_exception_handler(ApiException, api_exception_handler)
     app.add_exception_handler(
@@ -55,11 +65,19 @@ def create_app(storage: Storage | None = None) -> FastAPI:
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
+        allow_origins=allowed_origins,
         allow_credentials=False,
-        allow_methods=["*"],
-        allow_headers=["*"],
+        allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+        allow_headers=["Accept", "Content-Type", "Authorization"],
     )
+
+    @app.middleware("http")
+    async def add_security_headers(request: Request, call_next):
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "no-referrer"
+        return response
 
     app.include_router(settings.router)
     app.include_router(event_types.router)
