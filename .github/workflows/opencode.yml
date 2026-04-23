@@ -29,7 +29,9 @@ jobs:
         uses: anomalyco/opencode/github@latest
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENCODE_CONFIG_CONTENT: >-
             {"permission":{"bash":"deny","seed-test-data":"deny","render-deploy-check":"deny","render_*":"deny","playwright_*":"deny","chrome-devtools_*":"deny"},"mcp":{"render":{"enabled":false},"playwright":{"enabled":false},"chrome-devtools":{"enabled":false}}}
         with:
           model: opencode/gpt-5.3-codex
+          use_github_token: true
