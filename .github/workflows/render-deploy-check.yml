@@ -33,7 +33,7 @@ jobs:
 
       - name: Wait for Render deploy
         run: |
-          node .opencode/tools/run-render-check.js --wait --timeout 300
+          node scripts/run-render-check.js --wait --timeout 300
 
       - name: Smoke check root
         run: |

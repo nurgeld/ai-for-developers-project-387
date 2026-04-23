@@ -46,7 +46,7 @@ Populates the Calendar API with test data:
 
 **Options**: `ownerName`, `force`, `bookingGuestName`, `bookingGuestEmail`, `bookingDurationMinutes`, `ensureBookingForToday`
 
-**Standalone script**: `.opencode/tools/run-seed.js` — run with `node .opencode/tools/run-seed.js`
+**Standalone script**: `scripts/run-seed.js` — run with `node scripts/run-seed.js`
 
 ---
 
@@ -188,9 +188,10 @@ tests/e2e/
 ├── mcp.json          # MCP server configuration
 └── tools/
     ├── seed-test-data.ts # Custom tool for test data
-    ├── run-seed.js       # Standalone seed script
-    ├── render-deploy-check.ts # MCP tool for Render deploy status
-    └── run-render-check.js   # Standalone CLI script for Render deploy check
+    └── render-deploy-check.ts # MCP tool for Render deploy status
+scripts/
+├── run-seed.js       # Standalone seed script
+└── run-render-check.js   # Standalone CLI script for Render deploy check
 ```
 
 ---

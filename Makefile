@@ -39,12 +39,12 @@ check-render:
 ifndef RENDER_API_KEY
 	$(error RENDER_API_KEY is not set. Get it from https://dashboard.render.com/settings#api-keys)
 endif
-	@node .opencode/tools/run-render-check.js --wait --timeout 300
+	@node scripts/run-render-check.js --wait --timeout 300
 check-render-quick:
 ifndef RENDER_API_KEY
 	$(error RENDER_API_KEY is not set)
 endif
-	@node .opencode/tools/run-render-check.js --format json
+	@node scripts/run-render-check.js --format json
 _start-backend:
 	cd backend && nohup poetry run python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 > /tmp/backend.log 2>&1 &
 _start-mock-api:
