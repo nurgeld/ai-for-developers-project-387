@@ -7,9 +7,11 @@ from pydantic import BaseModel, ValidationError as PydanticValidationError
 
 from app.models import (
     ConflictError,
+    ForbiddenError,
     DuplicateDurationError,
     InvalidSlotTimeError,
     NotFoundError,
+    UnauthorizedError,
     ValidationError,
 )
 
@@ -50,6 +52,20 @@ def conflict_error() -> ApiException:
 
 def not_found_error(message: str) -> ApiException:
     return ApiException(status_code=404, payload=NotFoundError(message=message))
+
+
+def unauthorized_error(message: Optional[str] = None) -> ApiException:
+    payload = UnauthorizedError()
+    if message is not None:
+        payload = UnauthorizedError(message=message)
+    return ApiException(status_code=401, payload=payload)
+
+
+def forbidden_error(message: Optional[str] = None) -> ApiException:
+    payload = ForbiddenError()
+    if message is not None:
+        payload = ForbiddenError(message=message)
+    return ApiException(status_code=403, payload=payload)
 
 
 async def api_exception_handler(_: Request, exc: ApiException) -> JSONResponse:

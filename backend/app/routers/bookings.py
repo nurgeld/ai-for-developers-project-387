@@ -3,7 +3,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, Query
 
-from app.dependencies import get_storage
+from app.dependencies import get_storage, require_owner_auth
 from app.models import Booking, CreateBookingRequest
 from app.services import cancel_booking, create_booking, list_owner_bookings
 from app.storage import Storage
@@ -19,7 +19,11 @@ def post_booking(
     return create_booking(storage, body)
 
 
-router_owner = APIRouter(prefix="/api/owner/bookings", tags=["Owner"])
+router_owner = APIRouter(
+    prefix="/api/owner/bookings",
+    tags=["Owner"],
+    dependencies=[Depends(require_owner_auth)],
+)
 
 
 @router_owner.get("", response_model=list[Booking])

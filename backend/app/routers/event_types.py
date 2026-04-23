@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 
-from app.dependencies import get_storage
+from app.dependencies import get_storage, require_owner_auth
 from app.models import CreateEventTypeRequest, EventType, UpdateEventTypeRequest
 from app.services import (
     create_event_type,
@@ -18,7 +18,11 @@ def get_event_types(storage: Storage = Depends(get_storage)) -> list[EventType]:
     return list_event_types(storage)
 
 
-router_owner = APIRouter(prefix="/api/owner/event-types", tags=["Owner"])
+router_owner = APIRouter(
+    prefix="/api/owner/event-types",
+    tags=["Owner"],
+    dependencies=[Depends(require_owner_auth)],
+)
 
 
 @router_owner.post("", response_model=EventType)

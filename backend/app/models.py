@@ -160,3 +160,13 @@ class ValidationError(BaseModel):
     error: Literal["VALIDATION_ERROR"] = "VALIDATION_ERROR"
     message: str
     details: Optional[list[str]] = None
+
+
+class UnauthorizedError(BaseModel):
+    error: Literal["UNAUTHORIZED"] = "UNAUTHORIZED"
+    message: str = "Требуется авторизация для доступа к owner API."
+
+
+class ForbiddenError(BaseModel):
+    error: Literal["FORBIDDEN"] = "FORBIDDEN"
+    message: str = "Недостаточно прав для выполнения операции."

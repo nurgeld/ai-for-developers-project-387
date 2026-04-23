@@ -56,6 +56,18 @@ poetry install
 poetry run uvicorn app.main:app --reload
 ```
 
+Required environment variables for owner/admin access:
+
+```bash
+export OWNER_API_TOKEN=replace_with_strong_random_token
+```
+
+Optional CORS allowlist (comma-separated):
+
+```bash
+export ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+```
+
 ### Backend Tests
 
 ```bash
@@ -150,6 +162,12 @@ The API contract is defined in `api/main.tsp` using TypeSpec and is the **single
 
 ### Owner Endpoints (`/api/owner`)
 
+All owner endpoints require a bearer token in `Authorization` header:
+
+```http
+Authorization: Bearer <OWNER_API_TOKEN>
+```
+
 | Method | Route | Description |
 |--------|-------|-------------|
 | PATCH | `/settings` | Update owner settings |
@@ -168,6 +186,8 @@ The API contract is defined in `api/main.tsp` using TypeSpec and is the **single
 | 404 | `NOT_FOUND` | Resource not found |
 | 409 | `SLOT_ALREADY_BOOKED` | Slot overlaps with existing booking |
 | 409 | `DUPLICATE_DURATION` | Event type with this duration already exists |
+| 401 | `UNAUTHORIZED` | Missing/invalid bearer auth for owner API |
+| 403 | `FORBIDDEN` | Bearer token is valid format but not allowed |
 
 ## Backend Architecture
 

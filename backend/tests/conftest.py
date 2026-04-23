@@ -15,6 +15,18 @@ def storage() -> Storage:
     return Storage()
 
 
+@pytest.fixture(autouse=True)
+def owner_api_token(monkeypatch: pytest.MonkeyPatch) -> str:
+    token = "test-owner-token"
+    monkeypatch.setenv("OWNER_API_TOKEN", token)
+    return token
+
+
+@pytest.fixture
+def owner_auth_headers(owner_api_token: str) -> dict[str, str]:
+    return {"Authorization": f"Bearer {owner_api_token}"}
+
+
 @pytest.fixture
 def client(storage: Storage) -> TestClient:
     app = create_app(storage)
