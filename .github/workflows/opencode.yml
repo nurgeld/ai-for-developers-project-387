@@ -30,14 +30,6 @@ jobs:
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
           OPENCODE_CONFIG_CONTENT: >-
-            {"tools":{"bash":false,"seed-test-data":false,"render-deploy-check":false},"mcp":{"render":{"enabled":false},"playwright":{"enabled":false},"chrome-devtools":{"enabled":false}}}
+            {"permission":{"bash":"deny","seed-test-data":"deny","render-deploy-check":"deny","render_*":"deny","playwright_*":"deny","chrome-devtools_*":"deny"},"mcp":{"render":{"enabled":false},"playwright":{"enabled":false},"chrome-devtools":{"enabled":false}}}
         with:
           model: opencode/gpt-5.3-codex
-          prompt: |
-            Work only with the repository contents and the GitHub issue/PR context.
-
-            This run is for issue/PR comment assistance.
-            Do not execute local scripts, deployment checks, or any localhost-dependent actions.
-            Provide explanation/analysis directly from repository and issue context.
-
-            For issue and PR comments, focus on explanation, analysis, and repository-contained code changes only.
