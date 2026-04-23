@@ -29,6 +29,9 @@ jobs:
         uses: anomalyco/opencode/github@latest
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_NAME: ${{ vars.RENDER_SERVICE_NAME }}
+          RENDER_BASE_URL: ${{ vars.RENDER_BASE_URL }}
           OPENCODE_CONFIG_CONTENT: >-
             {"tools":{"bash":false,"seed-test-data":false,"render-deploy-check":false}}
         with:
