@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 from fastapi import FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
@@ -12,6 +13,29 @@ from app.routers import settings, event_types, slots, bookings, owner_settings
 
 
 DIST_DIR = Path(__file__).resolve().parents[2] / "dist"
+DEFAULT_ALLOWED_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173"]
+ALLOWED_METHODS = ["GET", "POST", "PATCH", "DELETE", "OPTIONS"]
+ALLOWED_HEADERS = ["Authorization", "Content-Type", "Accept"]
+
+
+def parse_allowed_origins() -> list[str]:
+    raw_origins = os.getenv("ALLOWED_ORIGINS")
+    if raw_origins is None:
+        return DEFAULT_ALLOWED_ORIGINS
+
+    origins = [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
+    if not origins:
+        raise RuntimeError("ALLOWED_ORIGINS is set but empty")
+
+    return origins
+
+
+def get_owner_api_token() -> str:
+    token = os.getenv("OWNER_API_TOKEN", "").strip()
+    if not token:
+        raise RuntimeError("OWNER_API_TOKEN environment variable is required")
+
+    return token
 
 
 def configure_spa(app: FastAPI) -> None:
@@ -46,6 +70,7 @@ def configure_spa(app: FastAPI) -> None:
 def create_app(storage: Storage | None = None) -> FastAPI:
     app = FastAPI(title="Calendar Booking API")
     app.state.storage = storage or Storage()
+    app.state.owner_api_token = get_owner_api_token()
 
     app.add_exception_handler(ApiException, api_exception_handler)
     app.add_exception_handler(
@@ -55,11 +80,19 @@ def create_app(storage: Storage | None = None) -> FastAPI:
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
+        allow_origins=parse_allowed_origins(),
         allow_credentials=False,
-        allow_methods=["*"],
-        allow_headers=["*"],
+        allow_methods=ALLOWED_METHODS,
+        allow_headers=ALLOWED_HEADERS,
     )
+
+    @app.middleware("http")
+    async def set_security_headers(request, call_next):
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "no-referrer"
+        return response
 
     app.include_router(settings.router)
     app.include_router(event_types.router)

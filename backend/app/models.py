@@ -156,6 +156,16 @@ class NotFoundError(BaseModel):
     message: str
 
 
+class UnauthorizedError(BaseModel):
+    error: Literal["UNAUTHORIZED"] = "UNAUTHORIZED"
+    message: str = "Missing or invalid authorization header. Use Bearer token."
+
+
+class ForbiddenError(BaseModel):
+    error: Literal["FORBIDDEN"] = "FORBIDDEN"
+    message: str = "Provided token does not grant access to this resource."
+
+
 class ValidationError(BaseModel):
     error: Literal["VALIDATION_ERROR"] = "VALIDATION_ERROR"
     message: str

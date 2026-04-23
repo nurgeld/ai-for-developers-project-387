@@ -1,11 +1,15 @@
 from fastapi import APIRouter, Depends
 
-from app.dependencies import get_storage
+from app.dependencies import get_storage, require_owner_auth
 from app.models import OwnerSettings, UpdateOwnerSettingsRequest
 from app.services import update_owner_settings
 from app.storage import Storage
 
-router = APIRouter(prefix="/api/owner", tags=["Owner"])
+router = APIRouter(
+    prefix="/api/owner",
+    tags=["Owner"],
+    dependencies=[Depends(require_owner_auth)],
+)
 
 
 @router.patch("/settings", response_model=OwnerSettings)

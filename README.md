@@ -53,8 +53,13 @@ npm run preview      # Preview production build
 ```bash
 cd backend
 poetry install
+export OWNER_API_TOKEN=replace_with_strong_random_token
+export ALLOWED_ORIGINS=http://localhost:5173
 poetry run uvicorn app.main:app --reload
 ```
+
+`OWNER_API_TOKEN` is required and protects all `/api/owner/*` endpoints via Bearer auth.
+`ALLOWED_ORIGINS` accepts a comma-separated allowlist for CORS origins.
 
 ### Backend Tests
 
@@ -159,12 +164,16 @@ The API contract is defined in `api/main.tsp` using TypeSpec and is the **single
 | GET | `/bookings` | List bookings (future only, sorted ASC) |
 | DELETE | `/bookings/{id}` | Cancel booking (204) |
 
+All owner endpoints require `Authorization: Bearer <OWNER_API_TOKEN>`.
+
 ### Error Responses
 
 | Status | Error Code | Description |
 |--------|-----------|-------------|
 | 400 | `INVALID_SLOT_TIME` | Slot time doesn't match grid or is outside work hours |
 | 400 | `VALIDATION_ERROR` | Request validation failed |
+| 401 | `UNAUTHORIZED` | Missing or invalid Authorization header |
+| 403 | `FORBIDDEN` | Invalid owner token |
 | 404 | `NOT_FOUND` | Resource not found |
 | 409 | `SLOT_ALREADY_BOOKED` | Slot overlaps with existing booking |
 | 409 | `DUPLICATE_DURATION` | Event type with this duration already exists |

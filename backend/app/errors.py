@@ -8,8 +8,10 @@ from pydantic import BaseModel, ValidationError as PydanticValidationError
 from app.models import (
     ConflictError,
     DuplicateDurationError,
+    ForbiddenError,
     InvalidSlotTimeError,
     NotFoundError,
+    UnauthorizedError,
     ValidationError,
 )
 
@@ -50,6 +52,18 @@ def conflict_error() -> ApiException:
 
 def not_found_error(message: str) -> ApiException:
     return ApiException(status_code=404, payload=NotFoundError(message=message))
+
+
+def unauthorized_error(
+    message: str = "Missing or invalid authorization header. Use Bearer token.",
+) -> ApiException:
+    return ApiException(status_code=401, payload=UnauthorizedError(message=message))
+
+
+def forbidden_error(
+    message: str = "Provided token does not grant access to this resource.",
+) -> ApiException:
+    return ApiException(status_code=403, payload=ForbiddenError(message=message))
 
 
 async def api_exception_handler(_: Request, exc: ApiException) -> JSONResponse:
