@@ -1,0 +1,45 @@
+name: OpenCode PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  opencode-review:
+    # Review internal PRs from humans and a single trusted bot.
+    if: >
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      (github.event.pull_request.user.type != 'Bot' || github.event.pull_request.user.login == 'opencode-agent[bot]') &&
+      (github.event.sender.type != 'Bot' || github.actor == 'opencode-agent[bot]') &&
+      github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Run OpenCode review
+        uses: anomalyco/opencode/github@latest
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENCODE_CONFIG_CONTENT: >-
+            {"permission":{"bash":"deny","seed-test-data":"deny","render-deploy-check":"deny","render_*":"deny","playwright_*":"deny","chrome-devtools_*":"deny"},"mcp":{"render":{"enabled":false},"playwright":{"enabled":false},"chrome-devtools":{"enabled":false}}}
+        with:
+          model: opencode/gpt-5.4
+          use_github_token: true
+          prompt: |
+            Review this pull request:
+            - Find bugs and risky changes
+            - Check readability and maintainability
+            - Leave actionable review comments
+            - Focus on changed code only
+            - Do not approve automatically
