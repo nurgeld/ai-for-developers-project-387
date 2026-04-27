@@ -14,6 +14,20 @@ This document captures the current prioritized development plan for the booking 
 - Owner API endpoints are protected by bearer token validation (`401/403` behavior is covered by tests).
 - Booking filters by `eventTypeId`, `startDate`, `endDate` are implemented in owner API and client layer.
 
+## Security hardening plan (OWASP cheat sheets)
+
+Selected checklists most relevant to the current architecture:
+
+1. [REST Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html)
+2. [Input Validation Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html)
+3. [Secrets Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)
+
+Small implementation plan:
+
+- REST Security baseline: enforce strict CORS policy, rate limiting for public booking endpoints, and secure headers.
+- Input Validation baseline: centralize validation rules for booking payloads (email/name/date-time), normalize error responses, and add boundary/abuse test cases.
+- Secrets baseline: move owner token and related sensitive config to managed secrets, define token rotation process, and document emergency key revoke flow.
+
 ## P0 — Critical
 
 ### 1) Add explicit health endpoint and wire it into platform health checks
@@ -116,9 +130,39 @@ Acceptance criteria:
 - Booking list and schedule view use consistent filtering behavior.
 - Filter state persists in URL query params.
 
+### 11) Apply REST API security baseline (OWASP REST Security)
+
+Issue title: `security: harden REST API surface using OWASP REST Security checklist`
+
+Acceptance criteria:
+- CORS is explicitly allowlisted per environment (no wildcard in production).
+- Basic rate limiting is enabled for public write endpoints (`POST /api/bookings`).
+- Security headers and content-type handling are validated in API responses.
+- Security-focused API tests cover CORS/rate-limit behavior.
+
+### 12) Strengthen input validation and abuse resistance (OWASP Input Validation)
+
+Issue title: `security: enforce centralized input validation and abuse test coverage`
+
+Acceptance criteria:
+- Validation constraints are consistent across API contract, backend models, and frontend forms.
+- Email, name, and date/time fields are validated for length, format, and edge cases.
+- Invalid payloads return predictable error schema without leaking internals.
+- Negative tests cover malformed payloads and boundary values.
+
+### 13) Introduce secrets lifecycle controls (OWASP Secrets Management)
+
+Issue title: `security: implement secret management and token rotation playbook`
+
+Acceptance criteria:
+- Owner API token is loaded from managed environment secret, never from source defaults.
+- Token rotation runbook is documented and verified in non-prod.
+- Emergency revoke/replace steps are documented for incident handling.
+- Configuration docs clearly separate required vs optional secrets.
+
 ## P2 — Product Growth
 
-### 11) Blocked dates and vacations
+### 14) Blocked dates and vacations
 
 Issue title: `feat: support blocked dates, vacations and manual time-off`
 
@@ -127,7 +171,7 @@ Acceptance criteria:
 - Public slot list excludes blocked periods.
 - Admin can manage exceptions.
 
-### 12) Email notifications
+### 15) Email notifications
 
 Issue title: `feat: send booking confirmation and cancellation emails`
 
@@ -136,7 +180,7 @@ Acceptance criteria:
 - Cancellation email is sent after cancel.
 - Email delivery failures do not break booking transaction.
 
-### 13) Guest self-service cancellation/rescheduling
+### 16) Guest self-service cancellation/rescheduling
 
 Issue title: `feat: allow guest self-service cancellation and rescheduling`
 
@@ -146,9 +190,9 @@ Acceptance criteria:
 - Token expiration/abuse protection is enforced.
 
 Dependencies:
-- Depends on P2.12.
+- Depends on P2.15.
 
-### 14) Multiple event types with same duration
+### 17) Multiple event types with same duration
 
 Issue title: `feat: allow multiple event types with the same duration`
 
@@ -157,7 +201,7 @@ Acceptance criteria:
 - No-overlap booking rule still holds.
 - Contract/backend/UI/tests are updated consistently.
 
-### 15) Export bookings to CSV/ICS
+### 18) Export bookings to CSV/ICS
 
 Issue title: `feat: export bookings to CSV and calendar formats`
 
@@ -174,19 +218,39 @@ Acceptance criteria:
 4. P0.4
 5. P0.5
 6. P1.6
-7. P1.7
-8. P1.8
-9. P1.9
-10. P1.10
-11. P2.11
-12. P2.12
-13. P2.13
+7. P1.11
+8. P1.13
+9. P1.7
+10. P1.8
+11. P1.12
+12. P1.9
+13. P1.10
 14. P2.14
 15. P2.15
+16. P2.16
+17. P2.17
+18. P2.18
 
-## Next Sprint Recommendation
+## Sprint Queue Recommendation
+
+### Sprint N+1 (platform stabilization)
 
 - P0.1 Add explicit health endpoint and Render healthcheck wiring.
 - P0.2 Move to Postgres persistence.
 - P0.3 Add migration flow.
 - P0.4 Add CI pipeline (lint/build/pytest).
+
+### Sprint N+2 (security baseline + admin access)
+
+- P0.5 Add E2E smoke in CI.
+- P1.6 Protect `/admin` route on frontend.
+- P1.11 Apply REST API security baseline.
+- P1.13 Introduce secrets lifecycle controls.
+
+### Sprint N+3 (quality hardening)
+
+- P1.7 Normalize API contract/runtime consistency.
+- P1.8 Improve admin settings client-side validation.
+- P1.12 Strengthen input validation and abuse resistance.
+- P1.9 Add operational logging and basic monitoring.
+- P1.10 Expose booking filters in admin UI.
