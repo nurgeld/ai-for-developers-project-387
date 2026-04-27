@@ -6,14 +6,22 @@ on:
   pull_request_review_comment:
     types: [created]
 
+concurrency:
+  group: opencode-${{ github.event.issue.number || github.event.pull_request.number || github.event.comment.id }}
+  cancel-in-progress: true
+
 jobs:
   opencode:
     if: |
-      contains(github.event.comment.body, '/oc') ||
-      contains(github.event.comment.body, '/opencode')
+      github.actor != 'opencode-agent[bot]' &&
+      github.event.sender.type != 'Bot' &&
+      github.event.comment.user.type != 'Bot' &&
+      (
+        contains(github.event.comment.body, '/oc') ||
+        contains(github.event.comment.body, '/opencode')
+      )
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
       contents: write
       pull-requests: write
       issues: write
@@ -23,12 +31,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 1
-          persist-credentials: true
-
-      - name: Configure git identity
-        run: |
-          git config --global user.name "opencode-agent[bot]"
-          git config --global user.email "opencode-agent[bot]@users.noreply.github.com"
+          persist-credentials: false
 
       - name: Run OpenCode
         uses: anomalyco/opencode/github@latest
@@ -38,5 +41,5 @@ jobs:
           OPENCODE_CONFIG_CONTENT: >-
             {"permission":{"bash":"deny","seed-test-data":"deny","render-deploy-check":"deny","render_*":"deny","playwright_*":"deny","chrome-devtools_*":"deny"},"mcp":{"render":{"enabled":false},"playwright":{"enabled":false},"chrome-devtools":{"enabled":false}}}
         with:
-          model: opencode/gpt-5.3-codex
+          model: opencode/gpt-5.1-codex
           use_github_token: true
