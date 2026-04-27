@@ -235,7 +235,6 @@ Acceptance criteria:
 
 ### Sprint N+1 (platform stabilization)
 
-- P0.1 Add explicit health endpoint and Render healthcheck wiring.
 - P0.2 Move to Postgres persistence.
 - P0.3 Add migration flow.
 - P0.4 Add CI pipeline (lint/build/pytest).
@@ -249,6 +248,7 @@ Acceptance criteria:
 
 ### Sprint N+3 (quality hardening)
 
+- P0.1 Add explicit health endpoint and Render healthcheck wiring.
 - P1.7 Normalize API contract/runtime consistency.
 - P1.8 Improve admin settings client-side validation.
 - P1.12 Strengthen input validation and abuse resistance.
