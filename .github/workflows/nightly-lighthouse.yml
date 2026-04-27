@@ -1,0 +1,50 @@
+name: nightly-lighthouse
+
+on:
+  schedule:
+    - cron: '0 21 * * *'
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: Override base URL
+        required: false
+        type: string
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    env:
+      BASE_URL: ${{ inputs.base_url || vars.RENDER_BASE_URL }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run Lighthouse audit
+        run: node scripts/run-lighthouse-audit.mjs
+
+      - name: Upload Lighthouse reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-lighthouse-${{ github.run_id }}
+          path: artifacts/lighthouse
+          retention-days: 14
+
+      - name: Publish summary
+        run: |
+          if [ -f artifacts/lighthouse/summary.md ]; then
+            cat artifacts/lighthouse/summary.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Lighthouse summary file not found." >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
